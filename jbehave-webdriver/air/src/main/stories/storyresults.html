@@ -1,0 +1,1471 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:ng="http://angularjs.org" xml:lang="en" lang="en">
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <script type="text/javascript" ng:autobind src="js/angular-0.9.15.js"></script>
+    <script type="text/javascript" src="js/jquery-1.5.2.js"></script>
+    <script type="text/javascript" src="js/jquery-ui.min-1.7.1.js"></script>
+    <script type="text/javascript" src="js/jquery-framedialog-1.1.2.js"></script>
+    <script type="text/javascript" src="js/jquery-corner-2.09.js"></script>
+    <script type="text/javascript" src="js/jquery.xml.js"></script>
+    <link rel="stylesheet" type="text/css" href="style/jbehave-navigator.css"/>
+    <link rel="stylesheet" type="text/css" href="style/jquery-ui.css"/>
+    <title>JBehave Story Manager</title>
+</head>
+<body ng:controller="MyController">
+<script type="text/javascript">
+    var JENKINS_URL = 'http://lfjenkins.swacorp.com/jenkins/';
+    var JENKINS_JOBS_URL = JENKINS_URL + 'job/';
+    var STORY_FILENAME_EXTENSION = '.story';
+	
+    /*
+     * Loads the story run result data & the build information. The build information is optional
+     * so if not present an alert is displayed to let the user know.
+     */
+    function MyController($resource) {
+        try {
+            this.Stats = null;
+            this.root = null;
+            this.checkStatsAvailability(this,$resource);
+            this.Story = $resource("xref.json");
+            this.data = this.Story.get({});
+            this.selectedStory;
+            this.dialog;
+            this.showStatus = false;
+            this.checkStatus();
+            try {
+                this.Build = $resource("build-info-from-Trunk.json");
+                this.buildData = this.Build.get({});
+            } catch (err) {
+                /* 
+                 * not required..
+                   alert("Unable to read build information, run will not be available.") 
+                 */
+            }
+        } catch (err) {
+            alert("Unable to read test run information, nothing to display.");
+        }
+    }
+
+	function showGrey(type){
+		if (type == 'newName')
+			var input = document.getElementById('newName');
+		else
+			var input = document.getElementById('clonName');
+		input.style.fontWeight = 'bold';
+		input.style.color='grey';
+	}
+	
+	function showBold(type) {
+		if (type == 'newName')
+			var input = document.getElementById('newName');
+		else
+			var input = document.getElementById('clonName');
+		if (input.value != "Add a New Story"){
+		input.style.fontWeight = 'bold';
+		input.style.color='black';
+		}
+	}
+    
+    MyController.$inject = ["$resource"];
+
+    MyController.prototype = {
+    	checkStatus: function() {
+    		this.showStatus = !document.location.hostname.match(/storymanager\.swacorp\.com/);
+    	},
+
+    showArtifacts : function(story) {
+           var filePath = "/screenshots/".concat(story.path.replace(/\//g,"-").replace(".story","")).concat("/artifact-index.html");
+           var fileRoot = window.location.href;
+           var fileLoc = fileRoot.substring(0,fileRoot.indexOf("view")).concat(filePath);
+           window.open(fileLoc);
+         },
+
+    showResults: function(story) {
+            var page_url,
+                title,
+                content,
+                controller = this;
+                
+            content = '';
+            type = (!document.location.hostname.match(/storymanager\.swacorp\.com/))?'results':'story';
+			title = ((type=='story')?'Scenarios for ':'Results for ') + story.path;
+			page_url = (type=='story')?story.path:story.html;
+			MyController.selectedStory = story;
+
+            $.ajax({
+                url: page_url,
+                dataType: (type=='story')?'text':'xml',
+                success: function(content) {
+					/*
+					 * Replace newline, '<' and '>' chars if type is 'story',
+					 * else avoid .js files loading that generate 404 errors
+					 */
+					if (type=='story') {
+						html = '<div class="story-container">' +
+							 content.replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\n/g, '<br/>')
+							 + '</div>';
+					} else {
+						html = '<div class="results-container"><div class="story">' +
+							$(content).find('.story').xml() + '</div></div>';
+					}
+					controller.showResultsDialog(title,html,type);
+                },
+                error: function(content) {
+                    alert("Ooops... there was problem loading results from "+page_url);
+                }
+            });
+        },
+        
+        _getResultsDialog: function() {
+            //singleton
+            if (!this.dialog) {
+                 this.dialog = $('<div/>').appendTo('body').dialog({
+                    autoOpen: false
+                 });
+            }
+            return this.dialog;
+        },
+        
+        showResultsDialog: function(title,content,type) {
+            var dialog = this._getResultsDialog();
+            var divName = (type=='story')?'.story-container':'.results-container';
+            if ($(divName)) {
+            	$(divName).remove();
+            }
+			if (type=='story') {
+				document.getElementById('clonName').value = '';
+				dialog.dialog('widget').append($('#controls'));
+			}
+			dialog.dialog('widget').append(content);
+            dialog.dialog('option','width',800);
+            dialog.dialog('option','height',500);
+            dialog.dialog('option','title',title);
+            dialog.dialog('open');
+			showHints();
+        },
+        
+		// It checks wether all checkbox are checked then the select all button shows checked
+        checkAllSelected : function(typeofStory){        	
+        	var fields = "";
+        	
+        	if (typeofStory == 'storySelect')
+        		fields = document.getElementsByName('storySelect');
+        	
+        	if (typeofStory == 'storySelectSmoke')
+        		fields = document.getElementsByName('storySelectSmoke');
+        	
+        	if (typeofStory == 'storySelectRegression')
+        		fields = document.getElementsByName('storySelectRegression');
+        	
+        	if (typeofStory == 'storySelectBaseLine')
+        		fields = document.getElementsByName('storySelectBaseLine');
+        	
+            var cont=0;
+            var i;
+                   
+            for (i = 0; i < fields.length; i++) {          	
+                if (fields[i].checked)
+                	cont++;
+            }
+            
+            if (fields.length == cont){   	
+            	if (typeofStory == 'storySelect')
+            		document.getElementById("storySelectAll").checked = true;
+            	if (typeofStory == 'storySelectSmoke')
+            		document.getElementById("storySmokeSelectAll").checked = true;
+            	if (typeofStory == 'storySelectRegression')
+            		document.getElementById("storyRegressionSelectAll").checked = true;
+            	if (typeofStory == 'storySelectBaseLine')
+            		document.getElementById("storyBaselineSelectAll").checked = true;
+            }
+            else
+            {   	
+            	if (typeofStory == 'storySelect')
+            		document.getElementById("storySelectAll").checked = false;
+            	if (typeofStory == 'storySelectSmoke')
+            		document.getElementById("storySmokeSelectAll").checked = false;
+            	if (typeofStory == 'storySelectRegression')
+            		document.getElementById("storyRegressionSelectAll").checked = false;
+            	if (typeofStory == 'storySelectBaseLine')
+            		document.getElementById("storyBaselineSelectAll").checked = false;
+            }
+        },
+        
+        // It selects all the stories onto the respective tab
+        selectAllStories : function(search,typeofStory) {
+        	var checkbox;
+        	
+        	if (typeofStory == "story")
+            	checkbox = document.getElementById("storySelectAll");
+
+        	if (typeofStory == "Smoke")
+        		checkbox = document.getElementById("storySmokeSelectAll");
+
+        	if (typeofStory == "regression")
+        		checkbox = document.getElementById("storyRegressionSelectAll");
+ 
+        	if (typeofStory == "baseline")
+        		checkbox = document.getElementById("storyBaselineSelectAll");
+
+        	
+            var checked = checkbox.checked;
+            
+            stories = angular.Array.filter(this.data.xref.stories, search);
+           
+            if (typeofStory == "story"){
+                angular.forEach (stories, function(story) {
+                	story.selected = checked;
+                });
+            }
+            
+            if (typeofStory == "Smoke"){
+	            angular.forEach (stories, function(story) {
+	            	story.selectedSmoke = checked;
+	            });
+            }            
+ 
+            if (typeofStory == "regression"){
+	            angular.forEach (stories, function(story) {
+	            	story.selectedRegression = checked;
+	            });
+            }  
+            
+            if (typeofStory == "baseline"){
+	            angular.forEach (stories, function(story) {
+	            	story.selectedBaseline = checked;
+	            });
+            }            
+            
+        },
+        
+        unselectFilter : function(typeofStory){
+        	switch (typeofStory){
+        	case'story':
+        		document.getElementById("storySelectAll").checked = false;
+        	    break;
+        	
+        	case'Smoke':
+        		document.getElementById("storySmokeSelectAll").checked = false;
+        	    break;
+        		
+        	case'regression':
+        		document.getElementById("storyRegressionSelectAll").checked = false;
+        	    break;
+        	
+        	case'baseline':
+        		document.getElementById("storyBaselineSelectAll").checked = false;
+        	    break;
+        	}
+        },
+        
+        runStory : function(buildNumber, revisions, tabs, typeofStory) {
+            var selector = '#' + tabs + ' #environmentSelector';
+            var envArray = $(selector)[0].options;
+            var tab = '#' + tabs + ' tbody input[type=checkbox]:checked';
+            var formSt = document.getElementById('formStories');
+            var dynaStubModeSelected = $("#" + tabs + " #dynaStubs").is(':checked');
+
+            if ($(tab).length > 0) {
+                if (envArray[$(selector)[0].selectedIndex].value != '0' || dynaStubModeSelected) {
+                    var storyNames = '';
+                    for (i = 0; i < $(tab).length; i++) {
+                        if ($(tab)[i].name != typeofStory) {
+                            var storyName = $(tab)[i].value;                            
+                            var storySplit = storyName.split('.');
+                            storyNames += storySplit[0];
+                            if (i < $(tab).length - 1) {
+                                storyNames += ',';
+                            }
+                        }
+                    }
+                    var revision = revisions[0].revision;
+                    for (i = 1; i < revisions.length; i++) {
+                        if (revision < revisions[i].revision) {
+                            revision = revisions[i].revision;
+                        }
+                    }
+                    document.getElementById('STORY_NAME').value = storyNames;
+                    var domain = JENKINS_JOBS_URL;
+
+                    if (dynaStubModeSelected) {
+                        document.getElementById('BUILDURL').value = 'Trunk_Build#'+buildNumber;
+                        document.getElementById('PARENT_SVN_REVISION').value = revision;
+                        domain +='Trunk_Test_JBehave_Ad_Hoc_DynaStubs/buildWithParameters';
+                    } else if (envArray[$(selector)[0].selectedIndex].value == '1') {
+                        document.getElementById('BUILDURL').value = 'Trunk_Build#'+buildNumber;
+                        document.getElementById('PARENT_SVN_REVISION').value = revision;
+                        domain +='Trunk_Test_JBehave_Ad_Hoc/buildWithParameters';
+                    } else {
+                        document.getElementById('ENVIRONMENT_HOST').value = envArray[$(selector)[0].selectedIndex].value;
+                        domain +='Environment_Test_JBehave_Ad_Hoc/buildWithParameters';
+                    }
+                    
+                    formSt.action = domain;
+
+                    var label = $(tab).length>1?'stories':'story';
+                    var answer = confirm('Are you sure to run the ' + label + '?');
+                    if (answer) {
+                        formSt.submit();
+                    }
+                } else {
+                    alert('You have to select an environment.');
+                }
+            } else {
+                alert('There are not selected stories.');
+            }
+        },
+        
+
+        validateFilename: function(input) {
+            if ((input.value.lenght == 0) || (input.value == input.title)) {
+                alert('You did not enter a file name.');
+                return false;
+            }
+            var name = this.addStoryExtension(input.value);
+            var ok = true;
+            angular.forEach(this.data.xref.stories, function(story) {
+                ok = ok && (story.path != name);
+            });
+            if (!ok) {
+            	alert('The file "' + name + '" already exists.');
+            }
+            return ok;
+        },
+        
+        addStoryExtension: function(filename) {
+            var len = filename.length;
+            if (filename.substring(len, len - 6) != STORY_FILENAME_EXTENSION) {
+                filename = filename + STORY_FILENAME_EXTENSION;
+            }
+            return filename;
+        },
+        
+        gotoQWiki: function(filename, content) {
+            /*
+             * TODO: replace following line with the real call to QWiki
+             */
+            alert('--This should be in QWiki--\n\nEditing "' + filename + '":\n\n' + 
+                content.substring(0,300).replace(/<br>/g, '\n') + ' [...]');
+        },
+        
+        
+        createNewStory: function() {
+            var input = document.getElementById('newName');
+            if (this.validateFilename(input) == true) {
+                filename = this.addStoryExtension(input.value);
+                this.gotoQWiki(filename, '');
+            }
+        },
+
+        cloneStory: function() {
+            var input = document.getElementById('clonName');
+            if (this.validateFilename(input) == true) {
+                filename = this.addStoryExtension(input.value);
+                this.gotoQWiki(filename, $('.story-container').html());
+            }
+        },
+        
+        editStory: function(event) {
+            this.gotoQWiki(MyController.selectedStory.path, $('.story-container').html());
+        },
+        
+        checkStatsAvailability: function(controller, $resource) {
+            var targetController = controller;
+            var urlStats = 'service-stats.json';
+
+            $.ajax({
+                url : urlStats,
+                type : 'GET',
+                dataType : 'json',
+                success: function(jsonData){
+                    targetController.Stats = $resource(urlStats);
+                    targetController.root = targetController.Stats.get({});
+                },
+                error : function(xhr, status) {
+                    $('#tabs6-menu').hide();
+                }
+            });
+        }
+
+    };
+	
+    angular.filter('newlines', function(text) {
+        return text.replace(/\n/g, '<br/>');
+    });
+
+	function unhideStatus() {
+        if (!document.location.hostname.match(/storymanager\.swacorp\.com/)) {
+            $('.status').show();
+            $('.status2').show();
+            $('.status3').show();
+            $('.status4').show();
+            $('.chkStatus').show();
+            $('.chkStatus2').show();
+            $('.chkStatus3').show();
+            $('.chkStatus4').show();
+            $('#page-title').text('Run Results');
+            document.title = "Run Results";
+            $('#tabs-1 table thead tr th.status').addClass('first');
+            $('#tabs-1 table thead tr th.flow').removeClass('first');
+            $('#tabs-2 table thead tr th.status2').addClass('first');
+            $('#tabs-2 table thead tr th.flow2').removeClass('first');
+            $('#tabs-3 table thead tr th.status3').addClass('first');
+            $('#tabs-3 table thead tr th.flow3').removeClass('first');
+            $('#tabs-4 table thead tr th.status4').addClass('first');
+            $('#tabs-4 table thead tr th.flow4').removeClass('first');
+            $('.create').hide();
+        } else {
+            $('.status').hide();
+            $('.status2').hide();
+            $('.status3').hide();
+            $('.status4').hide();
+            $('.chkStatus').hide();
+            $('.chkStatus2').hide();
+            $('.chkStatus3').hide();
+            $('.chkStatus4').hide();
+            $('#tabs-1 table thead tr th.status').removeClass('first');
+            $('#tabs-1 table thead tr th.flow').addClass('first');
+            $('#tabs-2 table thead tr th.status2').removeClass('first');
+            $('#tabs-2 table thead tr th.flow2').addClass('first');
+            $('#tabs-3 table thead tr th.status3').removeClass('first');
+            $('#tabs-3 table thead tr th.flow3').addClass('first');
+            $('#tabs-4 table thead tr th.status4').removeClass('first');
+            $('#tabs-4 table thead tr th.flow4').addClass('first');
+            $('#tabs-1 table tr th.create').addClass('first');
+            $('#tabs6-menu').hide();
+            $('.create').show();
+        }
+		$('.hidden-controls').hide();
+    }
+    
+    function showHints() {
+    	// find all the input elements with title attributes
+    	$('input[title!=""]').hint();
+    }
+    
+    $(document).ready(function() {
+        //RESET and SORT-HEADER HANDLER
+        $('thead th a').click(function() {
+            //INIT
+            var parentId = $(this).parent().parent().parent().parent().parent().attr("id");
+            var thisId = this.id.substring(0,(this.id.length-4));
+            var thisIdObj = ((this.id).indexOf('-des') != -1) ? '#'+thisId+'-asc' : '#'+thisId+'-des';
+            //RESET
+            $('#'+parentId+' thead th a').each(function() { $(this).attr('class', 'reset'); });
+            $(this).hide();
+            //SORT-HANDLER
+            $(thisIdObj).attr('class', 'ascending');
+            $(thisIdObj).show();
+        });
+        $("#tabs").tabs();
+        $(".show_hide").click(function() {
+        	if ($(this).is(":checked")) {
+                $("." + this.value).show();
+        	} else {
+                $("." + this.value).hide();
+        	}
+        });
+        $('#liveMode').attr('checked', true);
+    });
+    
+    function enableLiveMode(tab) {
+         $('#' + tab + ' #environmentSelector').removeAttr('disabled');
+    }
+
+    function enableDynaMode(tab) {
+         $('#' + tab + ' #environmentSelector').attr('disabled', 'disabled');
+    }
+
+    if ($.browser.msie) {
+        $('thead tr.columnTitles  th.first').corner('tl');
+        $('thead tr.columnTitles  th.last').corner('tr');
+        $('thead th.section').corner('top');
+        $('tfoot tr  td').corner('bottom');
+        $('#main-content').corner();
+        $('#header').corner();
+        $('#footer').corner();
+        $('.ui-corner-top').corner('4px tl tr');
+        $('.ui-corner-all').corner();
+    }
+
+    /*
+	 * Show a 'hint' inside the input box when it is not in focus (aka blurred),
+	 * hide the hint when the text input has focus.
+	 */
+	(function ($) {
+        $.fn.hint = function (blurClass) {
+            if (!blurClass) { 
+                blurClass = 'blur';
+            }
+            
+            return this.each(function () {
+                // get jQuery version of 'this'
+                var $input = $(this),
+                    // capture the rest of the variable to allow for reuse
+                    title = $input.attr('title'),
+                    $form = $(this.form),
+                    $win = $(window);
+                
+                function remove() {
+                    if ($input.val() === title && $input.hasClass(blurClass)) {
+                        $input.val('').removeClass(blurClass);
+                    }
+                }
+                
+                // only apply logic if the element has the attribute
+                if (title) { 
+                    // on blur, set value to title attr if text is blank
+                    $input.blur(function () {
+                        if (this.value === '') {
+                            $input.val(title).addClass(blurClass);
+                        }
+                    }).focus(remove).blur(); // now change all inputs to title
+                    
+                    // clear the pre-defined text when form is submitted
+                    $form.submit(remove);
+                    $win.unload(remove); // handles Firefox's autocomplete
+                }
+            });
+        };
+    })(jQuery);
+</script>
+
+<div class="hidden-controls">
+<div id="controls">
+	<table class="controls">
+		<tr id="actions">
+			<th>
+				<input id="clonName" type="text" onFocus="showBold('clonName');" onBlur="showGrey('clonName');" value="" title="Enter the new story filename" maxlength="50"/>
+				<input id="cloneBtn" type="button" value="Clone this story" ng:click="cloneStory()" />
+			</th>
+			<th align="right">
+				<input id="editBtn" type="button" value="Edit this story" ng:click="editStory()" />
+			</th>
+		</tr>
+	</table>
+</div>
+</div>
+
+<div id="page-wrap">
+    <div id="inside">
+        <div id="header">
+            <a href="http://storymanager.swacorp.com"><img src="images/bg-southwest-logo.png" alt="Southwest Airlines"/></a>
+            <h1 id="page-title">Story Manager</h1>
+            <h2>{{data.xref.metaFilter}}</h2>
+        </div>
+        <div id="main-content">
+            <form id="formStories" method="post" action="">
+                <input type="hidden" name="BUILDURL" id="BUILDURL"/>
+                <input type="hidden" name="STORY_NAME" id="STORY_NAME"/>
+                <input type="hidden" name="PARENT_SVN_REVISION" id="PARENT_SVN_REVISION"/>
+                <input type="hidden" name="ENVIRONMENT_HOST" id="ENVIRONMENT_HOST"/>
+            </form>
+            <div id="tabs">
+                <ul>
+                    <li><a href="#tabs-1" ng:click="search.suite='';checkAllSelected('storySelect')">Stories</a></li>
+                    <li><a href="#tabs-2" ng:click="searchSmoke.suite='smoke';checkAllSelected('storySelectSmoke')">Smoke</a></li>   
+                    <li><a href="#tabs-3" ng:click="searchBaseline.suite='baseline';checkAllSelected('storySelectBaseLine')">Baseline</a></li>
+                    <li><a href="#tabs-4" ng:click="searchRegression.suite='regression';checkAllSelected('storySelectRegression')">Regression</a></li>  
+                    <li><a href="#tabs-5">Steps</a></li>    
+                    <li id="tabs6-menu"><a href="#tabs-6">Service Statistics</a></li>    
+                    <li id="tabs7-menu"><a href="#tabs-7">Homepages</a></li>
+                                        
+                </ul>
+                <div id="tabs-1">
+                    <div id="section">Stories 
+                        <p id="sectionNote">{{data.xref.stories.$filter(search).$size()}} of {{data.xref.stories.$size()}} stories shown</p>
+                    </div>
+                    <div id="sectionFilter">Filter scenarios:
+                        <input name="search.scenarios" class="filterInput" />
+                        <div id="view-selector">
+                            <label>View:</label>
+                            <ul>
+                                <li><input type="checkbox" class="show_hide" value="path" checked="false"> Path</input></li>
+                                <li class="chkStatus"><input type="checkbox" name="chkStatus" class="show_hide" value="status" checked="true">&nbsp;Status</input></li>
+                                <li><input type="checkbox" name="chkPath" class="show_hide" value="path" checked="true">&nbsp;Path</input></li>
+                                <li><input type="checkbox" name="chkFlow" class="show_hide" value="flow" checked="true">&nbsp;Flow</input></li>
+                                <li><input type="checkbox" name="chkProcess" class="show_hide" value="process" checked="true">&nbsp;Process</input></li>
+                                <li><input type="checkbox" name="chkUser" class="show_hide" value="user" checked="true">&nbsp;User</input></li>
+                                <li><input type="checkbox" name="chkTraveler" class="show_hide" value="traveler" checked="true">&nbsp;Traveler</input></li>
+                                <li><input type="checkbox" name="chkProject" class="show_hide" value="project" checked="true">&nbsp;Project</input></li>
+                                <!--<li><input type="checkbox" name="chkDescription" class="show_hide" value="description" checked="true">&nbsp;Description</input></li>                                -->
+                                <!--<li><input type="checkbox" name="chkNarrative" class="show_hide" value="narrative" checked="true">&nbsp;Narrative</input></li>-->
+                                <!--<li><input type="checkbox" name="chkStarted" class="show_hide" value="started" checked="false">&nbsp;Started</input></li>-->
+                                <!--<li><input type="checkbox" name="chkDuration" class="show_hide" value="duration" checked="false">&nbsp;Duration</input></li>-->
+                            </ul>
+                        </div>
+                    </div>
+                    <table summary="Air Book JBehave Stories" cellspacing="0" cellpadding="0">
+                        <thead>
+                            <tr ng:init="predicate = 'passed'" class="columnTitles">
+                                <th class="status first">
+                                    <a href id="status-asc" class="ascending" ng:click="predicate = 'passed'">Status</a>
+                                    <a href id="status-des" class="descending" ng:click="predicate = '-passed'">Status</a>
+                                </th>
+                                <th style="color:yellow" class="status" ng:show="chkStatus && showStatus">
+                                    Story
+                                </th>
+                                <th class="path">
+                                    <a href id="path-asc" class="ascending" ng:click="predicate = 'path'">Path</a>
+                                    <a href id="path-des" class="descending" ng:click="predicate = '-path'">Path</a>
+                                </th>
+                                <th class="flow">
+                                    <a href id="flow-asc" class="ascending" ng:click="predicate = 'flow'">Flow</a>
+                                    <a href id="flow-des" class="descending" ng:click="predicate = '-flow'">Flow</a>
+                                </th>
+                                <th class="process">
+                                    <a href id="process-asc" class="ascending" ng:click="predicate = 'process'">Process</a>
+                                    <a href id="process-des" class="descending" ng:click="predicate = '-process'">Process</a>
+                                </th>                                
+                                <th class="user">
+                                    <a href id="user-asc" class="ascending" ng:click="predicate = 'user'">User</a>
+                                    <a href id="user-des" class="descending" ng:click="predicate = '-user'">User</a>
+                                </th>
+                                <th class="traveler">
+                                    <a href id="traveler-asc" class="ascending" ng:click="predicate = 'traveler'">Traveler</a>
+                                    <a href id="traveler-des" class="descending" ng:click="predicate = '-traveler'">Traveler</a>
+                                </th>
+                                <th class="project">
+                                    <a href id="project-asc" class="ascending" ng:click="predicate = 'project'">Project</a>
+                                    <a href id="project-des" class="descending" ng:click="predicate = '-project'">Project</a>
+                                </th>
+                                <!--<th class="description">-->
+                                    <!--<a href id="description-asc" class="ascending" ng:click="predicate = 'description'">Description</a>-->
+                                    <!--<a href id="description-des" class="descending" ng:click="predicate = '-description'">Description</a>-->
+                                <!--</th>-->
+                                <!--<th class="narrative">-->
+                                    <!--<a href id="narrative-asc" class="ascending" ng:click="predicate = 'narrative'">Narrative</a>-->
+                                    <!--<a href id="narrative-des" class="descending" ng:click="predicate = '-narrative'">Narrative</a>-->
+                                <!--</th>-->
+                                <!--<th class="started">-->
+                                    <!--<a href id="started-asc" class="ascending" ng:click="predicate = 'started'">Started</a>-->
+                                    <!--<a href id="started-des" class="descending" ng:click="predicate = '-started'">Started</a>-->
+                                <!--</th>-->
+                                <!--<th class="duration">-->
+                                    <!--<a href id="duration-asc" class="ascending" ng:click="predicate = 'duration'">Duration</a>-->
+                                    <!--<a href id="duration-des" class="descending" ng:click="predicate = '-duration'">Duration</a>-->
+                                <!--</th>-->
+                                <th class="run last">
+                                    <span class="header">Select</span>
+                                </th>
+                            </tr>
+                            <tr class="filters">
+                                <th class="status">
+                                    <select ng:init="search.passed = ''" name="search.passed" class="filterInput">
+                                        <option value="" selected="selected" ng:click="unselectFilter('story')">- All -</option>
+                                        <option value="false" selected="selected">Failed</option>
+                                        <option value="true" selected="selected">Passed</option>
+                                    </select>
+                                </th>
+                                <th style="color:yellow"  class="status" ng:show="chkStatus && showStatus">
+                                    Artifacts
+                                </th>
+                                <th class="path">
+                                    <input name="search.path" class="filterInput" style="word-wrap: break-word; max-width: 3cm !important;"/>
+                                </th>
+                                <th class="flow">
+                                    <select ng:init="search.flow = ''" name="search.flow" class="filterInput">
+                                        <option value="" selected="selected" ng:click="unselectFilter('story')">- All -</option>
+                                        <option ng:repeat="flow in data.xref.flows.$orderBy(predicate)">{{flow}}</option>
+                                    </select>
+                                </th>
+                                <th class="process">
+                                    <select ng:init="search.process = ''" name="search.process" class="filterInput">
+                                        <option value="" selected="selected" ng:click="unselectFilter('story')">- All -</option>
+                                        <option ng:repeat="process in data.xref.processes.$orderBy(predicate)">{{process}}</option>
+                                    </select>
+                                </th>                                
+                                <th class="user">
+                                    <select ng:init="search.user = ''" name="search.user" class="filterInput">
+                                        <option value="" selected="selected" ng:click="unselectFilter('story')">- All -</option>
+                                        <option ng:repeat="user in data.xref.users.$orderBy(predicate)">{{user}}</option>
+                                    </select>
+                                </th>
+                                <th class="traveler">
+                                    <select ng:init="search.traveler = ''" name="search.traveler" class="filterInput">
+                                        <option value="" selected="selected" ng:click="unselectFilter('story')">- All -</option>
+                                        <option ng:repeat="traveler in data.xref.travelers.$orderBy(predicate)">{{traveler}}</option>
+                                    </select>
+                                </th>
+                                <th class="project">
+                                    <select ng:init="search.project = ''" name="search.project" class="filterInput">
+                                        <option value="" selected="selected" ng:click="unselectFilter('story')">- All -</option>
+                                        <option ng:repeat="project in data.xref.projects.$orderBy(predicate)">{{project}}</option>
+                                    </select>
+                                </th>
+                                <!--<th class="description">-->
+                                    <!--<input name="search.description" class="filterInput"/>-->
+                                <!--</th>-->
+                                <!--<th class="narrative">-->
+                                    <!--<input name="search.narrative" class="filterInput"/>-->
+                                <!--</th>-->
+                                <!--<th class="started"/>-->
+                                <!--<th class="duration total">{{data.xref.stories.$filter(search).$sum('duration') /1000 | number:0}} secs</th>-->
+                                <th class="run">
+                                    <input type="checkbox" id="storySelectAll" value="a" name="storySelectAll" ng:click="selectAllStories(search,'story')" />
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng:repeat="story in data.xref.stories.$filter(search).$orderBy(predicate)"
+                                title="Click to view the story details" class="draft-{{story.draft}}">
+                                <td ng:show="chkStatus && showStatus" ng:click="showResults(story)" class="status"><img src="images/icon-{{story.passed}}.png" alt="{{story.passed}}" /></td>
+                                <!--<td ng:show="chkStatus && showStatus" class="path"><a href="{{story.sauceLabsUrl}}">job</a></td>-->
+                                <td ng:show="chkStatus && showStatus" ng:click="showArtifacts(story)" class="path"><a  href='#'><h3 style="padding-top:8px;color:yellow">artifacts</h3></a></td>
+                                <td ng:show="chkPath" ng:click="showResults(story)" class="path" style="word-wrap: break-word; max-width: 3cm !important;">{{story.path}}</td>
+                                <td ng:show="chkFlow" ng:click="showResults(story)" class="flow">{{story.flow}}</td>
+                                <td ng:show="chkProcess" ng:click="showResults(story)" class="process">{{story.process}}</td>                                
+                                <td ng:show="chkUser" ng:click="showResults(story)" class="user">{{story.user}}</td>
+                                <td ng:show="chkTraveler" ng:click="showResults(story)" class="traveler">{{story.traveler}}</td>
+                                <td ng:show="chkProject" ng:click="showResults(story)" class="project">{{story.project}}</td>
+                                <!--<td ng:show="chkDescription" ng:click="showResults(story)" class="description" style="word-wrap: break-word; max-width: 3cm !important;">{{story.description}}</td>-->
+                                <!--<td ng:show="chkNarrative" ng:click="showResults(story)" class="narrative">{{story.narrative | newlines | html}}</td>-->
+                                <!--<td ng:show="chkStarted" class="started">-->
+                                    <!--<div>{{story.started | date:'MM-dd-yyyy'}}</div>-->
+                                    <!--<div>{{story.started | date:'HH:mm:ss'}}</div>-->
+                                <!--</td>-->
+                                <!--<td ng:show="chkDuration" class="duration">{{story.duration / 1000 | number:1}}</td>-->
+                                <td class="run">
+                                    <input type="checkbox" name="storySelect" value="{{story.path}}" ng:click="checkAllSelected('storySelect')" ng:change="story.selected=!story.selected" checked="{{story.selected}}" />
+                                </td>
+                            </tr>
+                        </tbody>
+                        <tfoot>
+                            <tr><td colspan="9">&nbsp;</td></tr>
+                        </tfoot>
+                    </table>
+                    <table>
+                        <tr id="actions">
+                            <th class="create">
+                                <br/>
+                                <strong style="font-size:medium;">Add a New Story</strong><br/>
+                                <p id="actions">To add a new story, enter the filename below and click create.</p>
+                                <input id="newName" type="text" onFocus="showBold('newName');" onBlur="showGrey('newName');" value="" title="Enter the new story filename" maxlength="50"/>
+                                <input id="addBtn" type="button" value="Create" ng:click="createNewStory()" />
+                            </th>
+                            <th ng:hide="buildData == null">
+                                <br/>
+                                <strong style="font-size:medium;">Run Selected Test Cases</strong><br/>
+                                <p id="actions">To run test cases: (1) check the stories above, (2) select the environment below, (3) click 'Run tests'</p>
+                                <div class="environmentStubSwitcher">
+                                    <label>
+                                        <input type="radio" name="stubSwitcher1" id="dynaStubs" value="dyna" onClick="enableDynaMode('tabs-1')"/> Dyna Stubs
+                                    </label>
+                                    <label>
+                                        <input type="radio" name="stubSwitcher1" id="liveMode" selected value="real" checked="checked" onClick="enableLiveMode('tabs-1')"/> Live Mode
+                                    </label>
+                                    <select id="environmentSelector" name="environmentSelector">
+                                        <option value="0" selected="selected">Select environment from this list</option>
+                                        <option value="1">Current environment</option>
+                                        <option value="ecom-dev-web-a.swacorp.com">Dev A</option>
+                                        <option value="ecom-dev-web-b.swacorp.com">Dev B</option>
+                                        <option value="ecom-dev-web-c.swacorp.com">Dev C</option>
+                                        <option value="ecom-dev-web-d.swacorp.com">Dev D</option>
+                                        <option value="ecom-dev-web-e.swacorp.com">Dev E</option>
+                                        <option value="ecom-dev-f.swacorp.com">Dev F</option>
+                                        <option value="ecom-dev-g.swacorp.com">Dev G</option>
+                                        <option value="ecom-dev-h.swacorp.com">Dev H</option>
+                                        <option value="ecom-dev-i.swacorp.com">Dev I</option>
+                                        <option value="ecom-dev-j.swacorp.com">Dev J</option>
+                                        <option value="ecom-itst-web-a.swacorp.com">ITST A</option>
+                                        <option value="ecom-itst-web-b.swacorp.com">ITST B</option>
+                                        <option value="ecom-itst-web-c.swacorp.com">ITST C</option>
+                                        <option value="ecom-itst-web-d.swacorp.com">ITST D</option>
+                                        <option value="ecom-itst-web-e.swacorp.com">ITST E</option>
+                                        <option value="southwest-ftst-a.swacorp.com">FTST A</option>
+                                        <option value="southwest-ftst-b.swacorp.com">FTST B</option>
+                                        <option value="southwest-ftst-c.swacorp.com">FTST C</option>
+                                        <option value="southwest-ftst-d.swacorp.com">FTST D</option>
+                                        <option value="southwest-ftst-e.swacorp.com">FTST E</option>
+                                        <option value="ecom-efix-web.swacorp.com/">EFIX</option>
+                                        <option value="ecom-cstg-web.swacorp.com/">CSTG</option>
+                                        <option value="ecom-ptst-web-p1.swacorp.com/">PTST P1</option>
+                                        <option value="ecom-ptst-web-a-s1.swacorp.com/">PTST S1</option>
+                                    </select>
+                                    <input id="runBtn" type="button" value="Run tests" ng:click="runStory(buildData.number, buildData.changeSet.revisions, 'tabs-1', 'storySelectAll')" />
+                                 </div>
+                            </th>
+                        </tr>
+                    </table>
+                </div>
+
+                <div id="tabs-2">
+                    <div id="section">Smoke 
+                        <p id="sectionNote">{{data.xref.stories.$filter(searchSmoke).$size()}} of {{data.xref.stories.$size()}} stories shown</p>
+                    </div>
+                    <div id="sectionFilter">Filter scenarios:
+                        <input name="searchSmoke.scenarios" class="filterInput" />
+                        <div id="view-selector">
+                            <label>View:</label>
+                            <ul>
+                                <li class="chkStatus2"><input type="checkbox" name="chkStatus2" class="show_hide" value="status2" checked="true">&nbsp;Status</input></li>
+                                <li><input type="checkbox" name="chkFlow2" class="show_hide" value="flow2" checked="true">&nbsp;Flow</input></li>
+                                <li><input type="checkbox" name="chkProcess2" class="show_hide" value="process2" checked="true">&nbsp;Process</input></li>
+                                <li><input type="checkbox" name="chkUser2" class="show_hide" value="user2" checked="true">&nbsp;User</input></li>
+                                <li><input type="checkbox" name="chkTraveler2" class="show_hide" value="traveler2" checked="true">&nbsp;Traveler</input></li>
+                                <li><input type="checkbox" name="chkProject2" class="show_hide" value="project2" checked="true">&nbsp;Project</input></li>
+                                <!--<li><input type="checkbox" name="chkDescription2" class="show_hide" value="description2" checked="true">&nbsp;Description</input></li>-->
+                                <li><input type="checkbox" name="chkNarrative2" class="show_hide" value="narrative2" checked="true">&nbsp;Narrative</input></li>
+                            </ul>
+                        </div>
+                    </div>
+                    <table summary="Air Book Smoke JBehave Stories" cellspacing="0" cellpadding="0">
+                        <thead>
+                            <tr ng:init="predicate = 'passed'" class="columnTitles">
+                                <th class="status2 first">
+                                    <a href id="status2-asc" class="ascending" ng:click="predicate = 'passed'">Status</a>
+                                    <a href id="status2-des" class="descending" ng:click="predicate = '-passed'">Status</a>
+                                </th>
+                                <th class="flow2">
+                                    <a href id="flow2-asc" class="ascending" ng:click="predicate = 'flow'">Flow</a>
+                                    <a href id="flow2-des" class="descending" ng:click="predicate = '-flow'">Flow</a>
+                                </th>
+                                <th class="process2">
+                                    <a href id="process2-asc" class="ascending" ng:click="predicate = 'process'">Process</a>
+                                    <a href id="process2-des" class="descending" ng:click="predicate = '-process'">Process</a>
+                                </th>                                
+                                <th class="user2">
+                                    <a href id="user2-asc" class="ascending" ng:click="predicate = 'user'">User</a>
+                                    <a href id="user2-des" class="descending" ng:click="predicate = '-user'">User</a>
+                                </th>
+                                <th class="traveler2">
+                                    <a href id="traveler2-asc" class="ascending" ng:click="predicate = 'traveler'">Traveler</a>
+                                    <a href id="traveler2-des" class="descending" ng:click="predicate = '-traveler'">Traveler</a>
+                                </th>
+                                <th class="project2">
+                                    <a href id="project2-asc" class="ascending" ng:click="predicate = 'project'">Project</a>
+                                    <a href id="project2-des" class="descending" ng:click="predicate = '-project'">Project</a>
+                                </th>
+                                <!--<th class="description2">-->
+                                    <!--<a href id="description2-asc" class="ascending" ng:click="predicate = 'description'">Description</a>-->
+                                    <!--<a href id="description2-des" class="descending" ng:click="predicate = '-description'">Description</a>-->
+                                <!--</th>-->
+                                <th class="narrative2">
+                                    <a href id="narrative2-asc" class="ascending" ng:click="predicate = 'narrative'">Narrative</a>
+                                    <a href id="narrative2-des" class="descending" ng:click="predicate = '-narrative'">Narrative</a>
+                                </th>
+                                <th class="run last">
+                                    <span class="header">Select</span>
+                                </th>
+                            </tr>
+                            <tr class="filters">
+                                <th class="status2">
+                                    <select ng:init="searchSmoke.passed = ''" name="searchSmoke.passed" class="filterInput">
+                                        <option value="" selected="selected" ng:click="unselectFilter('Smoke')">- All -</option>
+                                        <option value="false" selected="selected">Failed</option>
+                                        <option value="true" selected="selected">Passed</option>
+                                    </select>
+                                </th>
+                                <th class="flow2">
+                                    <select ng:init="searchSmoke.flow = ''" name="searchSmoke.flow" class="filterInput">
+                                        <option value="" selected="selected" ng:click="unselectFilter('Smoke')">- All -</option>
+                                        <option ng:repeat="flow in data.xref.flows.$orderBy(predicate)">{{flow}}</option>
+                                    </select>
+                                </th>
+                                <th class="process2">
+                                    <select ng:init="searchSmoke.process = ''" name="searchSmoke.process" class="filterInput">
+                                        <option value="" selected="selected" ng:click="unselectFilter('Smoke')">- All -</option>
+                                        <option ng:repeat="process in data.xref.processes.$orderBy(predicate)">{{process}}</option>
+                                    </select>
+                                </th>                                
+                                <th class="user2">
+                                    <select ng:init="searchSmoke.user = ''" name="searchSmoke.user" class="filterInput">
+                                        <option value="" selected="selected" ng:click="unselectFilter('Smoke')">- All -</option>
+                                        <option ng:repeat="user in data.xref.users.$orderBy(predicate)">{{user}}</option>
+                                    </select>
+                                </th>
+                                <th class="traveler2">
+                                    <select ng:init="searchSmoke.traveler = ''" name="searchSmoke.traveler" class="filterInput">
+                                        <option value="" selected="selected" ng:click="unselectFilter('Smoke')">- All -</option>
+                                        <option ng:repeat="traveler in data.xref.travelers.$orderBy(predicate)">{{traveler}}</option>
+                                    </select>
+                                </th>
+                                <th class="project2">
+                                    <select ng:init="searchSmoke.project = ''" name="searchSmoke.project" class="filterInput">
+                                        <option value="" selected="selected" ng:click="unselectFilter('Smoke')">- All -</option>
+                                        <option ng:repeat="project in data.xref.projects.$orderBy(predicate)">{{project}}</option>
+                                    </select>
+                                </th>
+                                <!--<th class="description2">-->
+                                    <!--<input name="searchSmoke.description" class="filterInput"/>-->
+                                <!--</th>-->
+                                <th class="narrative2">
+                                    <input name="searchSmoke.narrative" class="filterInput"/>
+                                </th>
+                                <th class="run">
+                                    <input type="checkbox" id="storySmokeSelectAll" value="a" name="storySmokeSelectAll" ng:click="selectAllStories(searchSmoke,'Smoke')" />
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng:repeat="story in data.xref.stories.$filter(searchSmoke).$orderBy(predicate)"
+                                title="Click to view the story details" class="draft-{{story.draft}}">
+                                <td ng:show="chkStatus2 && showStatus" ng:click="showResults(story)" class="status2"><img src="images/icon-{{story.passed}}.png" alt="{{story.passed}}" /></td>
+                                <td ng:show="chkFlow2" ng:click="showResults(story)" class="flow2">{{story.flow}}</td>
+                                <td ng:show="chkProcess2" ng:click="showResults(story)" class="process2">{{story.process}}</td>                                
+                                <td ng:show="chkUser2" ng:click="showResults(story)" class="user2">{{story.user}}</td>
+                                <td ng:show="chkTraveler2" ng:click="showResults(story)" class="traveler2">{{story.traveler}}</td>
+                                <td ng:show="chkProject2" ng:click="showResults(story)" class="project2">{{story.project}}</td>
+                                <!--<td ng:show="chkDescription2" ng:click="showResults(story)" class="description2" style="word-wrap: break-word; max-width: 3cm !important;">{{story.description}}</td>-->
+                                <td ng:show="chkNarrative2" ng:click="showResults(story)" class="narrative2">{{story.narrative | newlines | html}}</td>
+                                <td class="run">
+                                    <input type="checkbox" name="storySelectSmoke" value="{{story.path}}" ng:click="checkAllSelected('storySelectSmoke')" ng:change="story.selectedSmoke=!story.selectedSmoke" checked="{{story.selectedSmoke}}" />
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                      <table>
+                        <tr id="actions">
+                            <th ng:hide="buildData == null">
+                                <br/>
+                                <strong style="font-size:medium;">Run Selected Smoke Test Cases</strong><br/>
+                                <p id="actions">To run test cases: (1) check the stories above, (2) select the environment below, (3) click 'Run tests'</p>
+                                <div class="environmentStubSwitcher">
+                                        <label>
+                                            <input type="radio" name="stubSwitcher2" id="dynaStubs" value="dyna" onClick="enableDynaMode('tabs-2')"/> Dyna Stubs
+                                        </label>
+                                        <label>
+                                            <input type="radio" name="stubSwitcher2" id="liveMode" value="real" checked="checked" onClick="enableLiveMode('tabs-2')"/> Live Mode
+                                        </label>
+                                    <select id="environmentSelector" name="environmentSelector">
+                                        <option value="0" selected="selected">Select environment from this list</option>
+                                        <option value="1">Current environment</option>
+                                        <option value="http://ecom-dev-web-a.swacorp.com/">Dev A</option>
+                                        <option value="http://ecom-dev-web-b.swacorp.com/">Dev B</option>
+                                        <option value="http://ecom-dev-web-c.swacorp.com/">Dev C</option>
+                                        <option value="http://ecom-dev-web-d.swacorp.com/">Dev D</option>
+                                        <option value="http://ecom-dev-web-e.swacorp.com/">Dev E</option>
+                                        <option value="http://ecom-dev-f.swacorp.com/">Dev F</option>
+                                        <option value="http://ecom-dev-g.swacorp.com/">Dev G</option>
+                                        <option value="http://ecom-dev-h.swacorp.com/">Dev H</option>
+                                        <option value="http://ecom-dev-i.swacorp.com/">Dev I</option>
+                                        <option value="http://ecom-dev-j.swacorp.com/">Dev J</option>
+                                        <option value="http://ecom-itst-web-a.swacorp.com/">ITST A</option>
+                                        <option value="http://ecom-itst-web-b.swacorp.com/">ITST B</option>
+                                        <option value="http://ecom-itst-web-c.swacorp.com/">ITST C</option>
+                                        <option value="http://ecom-itst-web-d.swacorp.com/">ITST D</option>
+                                        <option value="http://ecom-itst-web-e.swacorp.com/">ITST E</option>
+                                        <option value="http://southwest-ftst-a.swacorp.com">FTST A</option>
+                                        <option value="http://southwest-ftst-b.swacorp.com">FTST B</option>
+                                        <option value="http://southwest-ftst-c.swacorp.com">FTST C</option>
+                                        <option value="http://southwest-ftst-d.swacorp.com">FTST D</option>
+                                        <option value="http://southwest-ftst-e.swacorp.com">FTST E</option>
+                                        <option value="http://ecom-efix-web.swacorp.com/">EFIX</option>
+                                        <option value="http://ecom-cstg-web.swacorp.com/">CSTG</option>
+                                        <option value="http://ecom-ptst-web-p1.swacorp.com/">PTST P1</option>
+                                        <option value="http://ecom-ptst-web-a-s1.swacorp.com/">PTST S1</option>
+                                    </select>
+                                    <input id="runBtn" type="button" value="Run tests" ng:click="runStory(buildData.number, buildData.changeSet.revisions, 'tabs-2', 'storySmokeSelectAll')" />
+                                </div>
+                            </th>
+                        </tr>
+                    </table> 
+                </div>
+
+               <div id="tabs-3">
+                    <div id="section">Baseline 
+                        <p id="sectionNote">{{data.xref.stories.$filter(searchBaseline).$size()}} of {{data.xref.stories.$size()}} stories shown</p>
+                    </div>
+                    <div id="sectionFilter">Filter scenarios:
+                        <input name="searchBaseline.scenarios" class="filterInput" />
+                        <div id="view-selector">
+                            <label>View:</label>
+                            <ul>
+                                <li class="chkStatus4"><input type="checkbox" name="chkStatus4" class="show_hide" value="status4" checked="true">&nbsp;Status</input></li>
+                                <li><input type="checkbox" name="chkFlow4" class="show_hide" value="flow4" checked="true">&nbsp;Flow</input></li>
+                                <li><input type="checkbox" name="chkProcess4" class="show_hide" value="process4" checked="true">&nbsp;Process</input></li>
+                                <li><input type="checkbox" name="chkUser4" class="show_hide" value="user4" checked="true">&nbsp;User</input></li>
+                                <li><input type="checkbox" name="chkTraveler4" class="show_hide" value="traveler4" checked="true">&nbsp;Traveler</input></li>
+                                <li><input type="checkbox" name="chkProject4" class="show_hide" value="project4" checked="true">&nbsp;Project</input></li>
+                                <!--<li><input type="checkbox" name="chkDescription4" class="show_hide" value="description4" checked="true">&nbsp;Description</input></li>-->
+                                <li><input type="checkbox" name="chkNarrative4" class="show_hide" value="narrative4" checked="true">&nbsp;Narrative</input></li>
+                            </ul>
+                        </div>
+                    </div>
+                    <table summary="Air Book Baseline JBehave Stories" cellspacing="0" cellpadding="0">
+                        <thead>
+                            <tr ng:init="predicate = 'passed'" class="columnTitles">
+                                <th class="status4 first">
+                                    <a href id="status4-asc" class="ascending" ng:click="predicate = 'passed'">Status</a>
+                                    <a href id="status4-des" class="descending" ng:click="predicate = '-passed'">Status</a>
+                                </th>
+                                <th class="flow4">
+                                    <a href id="flow4-asc" class="ascending" ng:click="predicate = 'flow'">Flow</a>
+                                    <a href id="flow4-des" class="descending" ng:click="predicate = '-flow'">Flow</a>
+                                </th>
+                                <th class="process4">
+                                    <a href id="process4-asc" class="ascending" ng:click="predicate = 'process'">Process</a>
+                                    <a href id="process4-des" class="descending" ng:click="predicate = '-process'">Process</a>
+                                </th>                                
+                                <th class="user4">
+                                    <a href id="user4-asc" class="ascending" ng:click="predicate = 'user'">User</a>
+                                    <a href id="user4-des" class="descending" ng:click="predicate = '-user'">User</a>
+                                </th>
+                                <th class="traveler4">
+                                    <a href id="traveler4-asc" class="ascending" ng:click="predicate = 'traveler'">Traveler</a>
+                                    <a href id="traveler4-des" class="descending" ng:click="predicate = '-traveler'">Traveler</a>
+                                </th>
+                                <th class="project4">
+                                    <a href id="project4-asc" class="ascending" ng:click="predicate = 'project'">Project</a>
+                                    <a href id="project4-des" class="descending" ng:click="predicate = '-project'">Project</a>
+                                </th>
+                                <!--<th class="description4">-->
+                                    <!--<a href id="description4-asc" class="ascending" ng:click="predicate = 'description'">Description</a>-->
+                                    <!--<a href id="description4-des" class="descending" ng:click="predicate = '-description'">Description</a>-->
+                                <!--</th>-->
+                                <th class="narrative4">
+                                    <a href id="narrative4-asc" class="ascending" ng:click="predicate = 'narrative'">Narrative</a>
+                                    <a href id="narrative4-des" class="descending" ng:click="predicate = '-narrative'">Narrative</a>
+                                </th>
+                                <th class="run last">
+                                    <span class="header">Select</span>
+                                </th>
+                            </tr>
+                            <tr class="filters">
+                                <th class="status4">
+                                    <select ng:init="searchBaseline.passed = ''" name="searchBaseline.passed" class="filterInput">
+                                        <option value="" selected="selected" ng:click="unselectFilter('baseline')">- All -</option>
+                                        <option value="false" selected="selected">Failed</option>
+                                        <option value="true" selected="selected">Passed</option>
+                                    </select>
+                                </th>
+                                <th class="flow4">
+                                    <select ng:init="searchBaseline.flow = ''" name="searchBaseline.flow" class="filterInput">
+                                        <option value="" selected="selected" ng:click="unselectFilter('baseline')">- All -</option>
+                                        <option ng:repeat="flow in data.xref.flows.$orderBy(predicate)">{{flow}}</option>
+                                    </select>
+                                </th>
+                                <th class="process4">
+                                    <select ng:init="searchBaseline.process = ''" name="searchBaseline.process" class="filterInput">
+                                        <option value="" selected="selected" ng:click="unselectFilter('baseline')">- All -</option>
+                                        <option ng:repeat="process in data.xref.processes.$orderBy(predicate)">{{process}}</option>
+                                    </select>
+                                </th>                                
+                                <th class="user4">
+                                    <select ng:init="searchBaseline.user = ''" name="searchBaseline.user" class="filterInput">
+                                        <option value="" selected="selected" ng:click="unselectFilter('baseline')">- All -</option>
+                                        <option ng:repeat="user in data.xref.users.$orderBy(predicate)">{{user}}</option>
+                                    </select>
+                                </th>
+                                <th class="traveler4">
+                                    <select ng:init="searchBaseline.traveler = ''" name="searchBaseline.traveler" class="filterInput">
+                                        <option value="" selected="selected" ng:click="unselectFilter('baseline')">- All -</option>
+                                        <option ng:repeat="traveler in data.xref.travelers.$orderBy(predicate)">{{traveler}}</option>
+                                    </select>
+                                </th>
+                                <th class="project4">
+                                    <select ng:init="searchBaseline.project = ''" name="searchBaseline.project" class="filterInput">
+                                        <option value="" selected="selected" ng:click="unselectFilter('baseline')">- All -</option>
+                                        <option ng:repeat="project in data.xref.projects.$orderBy(predicate)">{{project}}</option>
+                                    </select>
+                                </th>
+                                <!--<th class="description4">-->
+                                    <!--<input name="searchBaseline.description" class="filterInput"/>-->
+                                <!--</th>-->
+                                <th class="narrative4">
+                                    <input name="searchBaseline.narrative" class="filterInput"/>
+                                </th>
+                                <th class="run">
+                                    <input type="checkbox" id="storyBaselineSelectAll" value="a" name="storyBaselineSelectAll" ng:click="selectAllStories(searchBaseline,'baseline')" />
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng:repeat="story in data.xref.stories.$filter(searchBaseline).$orderBy(predicate)"
+                                title="Click to view the story details" class="draft-{{story.draft}}">
+                                <td ng:show="chkStatus4 && showStatus" ng:click="showResults(story)" class="status4"><img src="images/icon-{{story.passed}}.png" alt="{{story.passed}}" /></td>
+                                <td ng:show="chkFlow4" ng:click="showResults(story)" class="flow4">{{story.flow}}</td>
+                                <td ng:show="chkProcess4" ng:click="showResults(story)" class="process4">{{story.process}}</td>                                
+                                <td ng:show="chkUser4" ng:click="showResults(story)" class="user4">{{story.user}}</td>
+                                <td ng:show="chkTraveler4" ng:click="showResults(story)" class="traveler4">{{story.traveler}}</td>
+                                <td ng:show="chkProject4" ng:click="showResults(story)" class="project4">{{story.project}}</td>
+                                <!--<td ng:show="chkDescription4" ng:click="showResults(story)" class="description4" style="word-wrap: break-word; max-width: 3cm !important;">{{story.description}}</td>-->
+                                <td ng:show="chkNarrative4" ng:click="showResults(story)" class="narrative4">{{story.narrative | newlines | html}}</td>
+                                <td class="run">
+                                    <input type="checkbox" name="storySelectBaseLine" value="{{story.path}}" ng:click="checkAllSelected('storySelectBaseLine')" ng:change="story.selectedBaseline=!story.selectedBaseline" checked="{{story.selectedBaseline}}" />
+                                </td>
+                            </tr>
+                        </tbody>
+                        <tfoot>
+                            <tr><td colspan="9">{{this.isLoggedIn}}&nbsp;</td></tr>
+                        </tfoot>
+                    </table>
+                    <table>
+                        <tr id="actions">
+                            <th ng:hide="buildData == null">
+                                <br/>
+                                <strong style="font-size:medium;">Run Selected Baseline Test Cases</strong><br/>
+                                <p id="actions">To run test cases: (1) check the stories above, (2) select the environment below, (3) click 'Run tests'</p>
+                                <div class="environmentStubSwitcher">
+                                    <label>
+                                        <input type="radio" name="stubSwitcher3" id="dynaStubs" value="dyna" onClick="enableDynaMode('tabs-3')"/> Dyna Stubs
+                                    </label>
+                                    <label>
+                                        <input type="radio" name="stubSwitcher3" id="liveMode" value="real" checked="checked" onClick="enableLiveMode('tabs-3')"/> Live Mode
+                                    </label>
+                                    <select id="environmentSelector" name="environmentSelector">
+                                        <option value="0" selected="selected">Select environment from this list</option>
+                                        <option value="1">Current environment</option>
+                                        <option value="http://ecom-dev-web-a.swacorp.com/">Dev A</option>
+                                        <option value="http://ecom-dev-web-b.swacorp.com/">Dev B</option>
+                                        <option value="http://ecom-dev-web-c.swacorp.com/">Dev C</option>
+                                        <option value="http://ecom-dev-web-d.swacorp.com/">Dev D</option>
+                                        <option value="http://ecom-dev-web-e.swacorp.com/">Dev E</option>
+                                        <option value="http://ecom-dev-f.swacorp.com/">Dev F</option>
+                                        <option value="http://ecom-dev-g.swacorp.com/">Dev G</option>
+                                        <option value="http://ecom-dev-h.swacorp.com/">Dev H</option>
+                                        <option value="http://ecom-dev-i.swacorp.com/">Dev I</option>
+                                        <option value="http://ecom-dev-j.swacorp.com/">Dev J</option>
+                                        <option value="http://ecom-itst-web-a.swacorp.com/">ITST A</option>
+                                        <option value="http://ecom-itst-web-b.swacorp.com/">ITST B</option>
+                                        <option value="http://ecom-itst-web-c.swacorp.com/">ITST C</option>
+                                        <option value="http://ecom-itst-web-d.swacorp.com/">ITST D</option>
+                                        <option value="http://ecom-itst-web-e.swacorp.com/">ITST E</option>
+                                        <option value="http://southwest-ftst-a.swacorp.com">FTST A</option>
+                                        <option value="http://southwest-ftst-b.swacorp.com">FTST B</option>
+                                        <option value="http://southwest-ftst-c.swacorp.com">FTST C</option>
+                                        <option value="http://southwest-ftst-d.swacorp.com">FTST D</option>
+                                        <option value="http://southwest-ftst-e.swacorp.com">FTST E</option>
+                                        <option value="http://ecom-efix-web.swacorp.com/">EFIX</option>
+                                        <option value="http://ecom-cstg-web.swacorp.com/">CSTG</option>
+                                        <option value="http://ecom-ptst-web-p1.swacorp.com/">PTST P1</option>
+                                        <option value="http://ecom-ptst-web-a-s1.swacorp.com/">PTST S1</option>
+                                    </select>
+                                    <input id="runBtn" type="button" value="Run tests" ng:click="runStory(buildData.number, buildData.changeSet.revisions, 'tabs-3', 'storyBaselineSelectAll')" />
+                                </div>
+                            </th>
+                        </tr>
+                    </table>
+                </div>
+                
+               <div id="tabs-4">
+                    <div id="section">Regression 
+                        <p id="sectionNote">{{data.xref.stories.$filter(searchRegression).$size()}} of {{data.xref.stories.$size()}} stories shown</p>
+                    </div>
+                    <div id="sectionFilter">Filter scenarios:
+                        <input name="searchRegression.scenarios" class="filterInput" />
+                        <div id="view-selector">
+                            <label>View:</label>
+                            <ul>
+                                <li class="chkStatus3"><input type="checkbox" name="chkStatus3" class="show_hide" value="status3" checked="true">&nbsp;Status</input></li>
+                                <li><input type="checkbox" name="chkFlow3" class="show_hide" value="flow3" checked="true">&nbsp;Flow</input></li>
+                                <li><input type="checkbox" name="chkProcess3" class="show_hide" value="process3" checked="true">&nbsp;Process</input></li>
+                                <li><input type="checkbox" name="chkUser3" class="show_hide" value="user3" checked="true">&nbsp;User</input></li>
+                                <li><input type="checkbox" name="chkTraveler3" class="show_hide" value="traveler3" checked="true">&nbsp;Traveler</input></li>
+                                <li><input type="checkbox" name="chkProject3" class="show_hide" value="project3" checked="true">&nbsp;Project</input></li>
+                                <!--<li><input type="checkbox" name="chkDescription3" class="show_hide" value="description3" checked="true">&nbsp;Description</input></li>-->
+                                <li><input type="checkbox" name="chkNarrative3" class="show_hide" value="narrative3" checked="true">&nbsp;Narrative</input></li>
+                            </ul>
+                        </div>
+                    </div>
+                    <table summary="Air Book Regression JBehave Stories" cellspacing="0" cellpadding="0">
+                        <thead>
+                            <tr ng:init="predicate = 'passed'" class="columnTitles">
+                                <th class="status3 first">
+                                    <a href id="status3-asc" class="ascending" ng:click="predicate = 'passed'">Status</a>
+                                    <a href id="status3-des" class="descending" ng:click="predicate = '-passed'">Status</a>
+                                </th>
+                                <th class="flow3">
+                                    <a href id="flow3-asc" class="ascending" ng:click="predicate = 'flow'">Flow</a>
+                                    <a href id="flow3-des" class="descending" ng:click="predicate = '-flow'">Flow</a>
+                                </th>
+                                <th class="process3">
+                                    <a href id="process3-asc" class="ascending" ng:click="predicate = 'process'">Process</a>
+                                    <a href id="process3-des" class="descending" ng:click="predicate = '-process'">Process</a>
+                                </th>                                
+                                <th class="user3">
+                                    <a href id="user3-asc" class="ascending" ng:click="predicate = 'user'">User</a>
+                                    <a href id="user3-des" class="descending" ng:click="predicate = '-user'">User</a>
+                                </th>
+                                <th class="traveler3">
+                                    <a href id="traveler3-asc" class="ascending" ng:click="predicate = 'traveler'">Traveler</a>
+                                    <a href id="traveler3-des" class="descending" ng:click="predicate = '-traveler'">Traveler</a>
+                                </th>
+                                <th class="project3">
+                                    <a href id="project3-asc" class="ascending" ng:click="predicate = 'project'">Project</a>
+                                    <a href id="project3-des" class="descending" ng:click="predicate = '-project'">Project</a>
+                                </th>
+                                <!--<th class="description3">-->
+                                    <!--<a href id="description3-asc" class="ascending" ng:click="predicate = 'description'">Description</a>-->
+                                    <!--<a href id="description3-des" class="descending" ng:click="predicate = '-description'">Description</a>-->
+                                <!--</th>-->
+                                <th class="narrative3">
+                                    <a href id="narrative3-asc" class="ascending" ng:click="predicate = 'narrative'">Narrative</a>
+                                    <a href id="narrative3-des" class="descending" ng:click="predicate = '-narrative'">Narrative</a>
+                                </th>
+                                <th class="run last">
+                                    <span class="header">Select</span>
+                                </th>
+                            </tr>
+                            <tr class="filters">
+                                <th class="status3">
+                                    <select ng:init="searchRegression.passed = ''" name="searchRegression.passed" class="filterInput">
+                                        <option value="" selected="selected" ng:click="unselectFilter('regression')">- All -</option>
+                                        <option value="false" selected="selected">Failed</option>
+                                        <option value="true" selected="selected">Passed</option>
+                                    </select>
+                                </th>
+                                <th class="flow3">
+                                    <select ng:init="searchRegression.flow = ''" name="searchRegression.flow" class="filterInput">
+                                        <option value="" selected="selected" ng:click="unselectFilter('regression')">- All -</option>
+                                        <option ng:repeat="flow in data.xref.flows.$orderBy(predicate)">{{flow}}</option>
+                                    </select>
+                                </th>
+                                <th class="process3">
+                                    <select ng:init="searchRegression.process = ''" name="searchRegression.process" class="filterInput">
+                                        <option value="" selected="selected" ng:click="unselectFilter('regression')">- All -</option>
+                                        <option ng:repeat="process in data.xref.processes.$orderBy(predicate)">{{process}}</option>
+                                    </select>
+                                </th>                                
+                                <th class="user3">
+                                    <select ng:init="searchRegression.user = ''" name="searchRegression.user" class="filterInput">
+                                        <option value="" selected="selected" ng:click="unselectFilter('regression')">- All -</option>
+                                        <option ng:repeat="user in data.xref.users.$orderBy(predicate)">{{user}}</option>
+                                    </select>
+                                </th>
+                                <th class="traveler3">
+                                    <select ng:init="searchRegression.traveler = ''" name="searchRegression.traveler" class="filterInput">
+                                        <option value="" selected="selected" ng:click="unselectFilter('regression')">- All -</option>
+                                        <option ng:repeat="traveler in data.xref.travelers.$orderBy(predicate)">{{traveler}}</option>
+                                    </select>
+                                </th>
+                                <th class="project3">
+                                    <select ng:init="searchRegression.project = ''" name="searchRegression.project" class="filterInput">
+                                        <option value="" selected="selected" ng:click="unselectFilter('regression')">- All -</option>
+                                        <option ng:repeat="project in data.xref.projects.$orderBy(predicate)">{{project}}</option>
+                                    </select>
+                                </th>
+                                <!--<th class="description3">-->
+                                    <!--<input name="searchRegression.description" class="filterInput"/>-->
+                                <!--</th>-->
+                                <th class="narrative3">
+                                    <input name="searchRegression.narrative" class="filterInput"/>
+                                </th>
+                                <th class="run">
+                                    <input type="checkbox" id="storyRegressionSelectAll" value="a" name="storyRegressionSelectAll" ng:click="selectAllStories(searchRegression,'regression')" />
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng:repeat="story in data.xref.stories.$filter(searchRegression).$orderBy(predicate)"
+                                title="Click to view the story details" class="draft-{{story.draft}}">
+                                <td ng:show="chkStatus3 && showStatus" ng:click="showResults(story)" class="status3"><img src="images/icon-{{story.passed}}.png" alt="{{story.passed}}" /></td>
+                                <td ng:show="chkFlow3" ng:click="showResults(story)" class="flow3">{{story.flow}}</td>
+                                <td ng:show="chkProcess3" ng:click="showResults(story)" class="process3">{{story.process}}</td>                                
+                                <td ng:show="chkUser3" ng:click="showResults(story)" class="user3">{{story.user}}</td>
+                                <td ng:show="chkTraveler3" ng:click="showResults(story)" class="traveler3">{{story.traveler}}</td>
+                                <td ng:show="chkProject3" ng:click="showResults(story)" class="project3">{{story.project}}</td>
+                                <!--<td ng:show="chkDescription3" ng:click="showResults(story)" class="description3" style="word-wrap: break-word; max-width: 3cm !important;">{{story.description}}</td>-->
+                                <td ng:show="chkNarrative3" ng:click="showResults(story)" class="narrative3">{{story.narrative | newlines | html}}</td>
+                                <td class="run">
+                                    <input type="checkbox" name="storySelectRegression" value="{{story.path}}" ng:click="checkAllSelected('storySelectRegression')" ng:change="story.selectedRegression=!story.selectedRegression" checked="{{story.selectedRegression}}" />
+                                </td>
+                            </tr>
+                        </tbody>
+                        <tfoot>
+                            <tr><td colspan="9">{{this.isLoggedIn}}&nbsp;</td></tr>
+                        </tfoot>
+                    </table>
+                    <table>
+                        <tr id="actions">
+                            <th ng:hide="buildData == null">
+                                <br/>
+                                <strong style="font-size:medium;">Run Selected Regression Test Cases</strong><br/>
+                                <p id="actions">To run test cases: (1) check the stories above, (2) select the environment below, (3) click 'Run tests'</p>
+                                <div class="environmentStubSwitcher">
+                                    <label>
+                                        <input type="radio" name="stubSwitcher4" id="dynaStubs" value="dyna" onClick="enableDynaMode('tabs-4')"/> Dyna Stubs
+                                    </label>
+                                    <label>
+                                        <input type="radio" name="stubSwitcher4" id="liveMode" value="real" checked="checked" onClick="enableLiveMode('tabs-4')"/> Live Mode
+                                    </label>
+                                    <select id="environmentSelector" name="environmentSelector">
+                                        <option value="0" selected="selected">Select environment from this list</option>
+                                        <option value="1">Current environment</option>
+                                        <option value="http://ecom-dev-web-a.swacorp.com/">Dev A</option>
+                                        <option value="http://ecom-dev-web-b.swacorp.com/">Dev B</option>
+                                        <option value="http://ecom-dev-web-c.swacorp.com/">Dev C</option>
+                                        <option value="http://ecom-dev-web-d.swacorp.com/">Dev D</option>
+                                        <option value="http://ecom-dev-web-e.swacorp.com/">Dev E</option>
+                                        <option value="http://ecom-dev-f.swacorp.com/">Dev F</option>
+                                        <option value="http://ecom-dev-g.swacorp.com/">Dev G</option>
+                                        <option value="http://ecom-dev-h.swacorp.com/">Dev H</option>
+                                        <option value="http://ecom-dev-i.swacorp.com/">Dev I</option>
+                                        <option value="http://ecom-dev-j.swacorp.com/">Dev J</option>
+                                        <option value="http://ecom-itst-web-a.swacorp.com/">ITST A</option>
+                                        <option value="http://ecom-itst-web-b.swacorp.com/">ITST B</option>
+                                        <option value="http://ecom-itst-web-c.swacorp.com/">ITST C</option>
+                                        <option value="http://ecom-itst-web-d.swacorp.com/">ITST D</option>
+                                        <option value="http://ecom-itst-web-e.swacorp.com/">ITST E</option>
+                                        <option value="http://southwest-ftst-a.swacorp.com">FTST A</option>
+                                        <option value="http://southwest-ftst-b.swacorp.com">FTST B</option>
+                                        <option value="http://southwest-ftst-c.swacorp.com">FTST C</option>
+                                        <option value="http://southwest-ftst-d.swacorp.com">FTST D</option>
+                                        <option value="http://southwest-ftst-e.swacorp.com">FTST E</option>
+                                        <option value="http://ecom-efix-web.swacorp.com/">EFIX</option>
+                                        <option value="http://ecom-cstg-web.swacorp.com/">CSTG</option>
+                                        <option value="http://ecom-ptst-web-p1.swacorp.com/">PTST P1</option>
+                                        <option value="http://ecom-ptst-web-a-s1.swacorp.com/">PTST S1</option>
+                                    </select>
+                                    <input id="runBtn" type="button" value="Run tests" ng:click="runStory(buildData.number, buildData.changeSet.revisions,'tabs-4', 'storyRegressionSelectAll')" />
+                                </div>
+                            </th>
+                        </tr>
+                    </table>
+                </div>            
+                           
+                <div id="tabs-5">
+                    <div id="section">Steps
+                        <p id="sectionNote" />
+                    </div>
+                    <div id="sectionFilter">Filter scenarios:
+                        <input name="stepSearch.usages" class="filterInput" />
+                    </div>
+                    <table cellspacing="0" cellpadding="0">
+                        <thead>
+                            <tr class="columnTitles">
+                                <th class="type first">
+                                    <a href id="type-asc" class="ascending" ng:click="stepPredicate = 'type'">Type</a>
+                                    <a href id="type-des" class="descending" ng:click="stepPredicate = '-type'">Type</a>
+                                </th>
+                                <th class="pattern">
+                                    <a href id="pattern-asc" class="ascending" ng:click="stepPredicate = 'annotatedPattern'">Pattern</a>
+                                    <a href id="pattern-des" class="descending" ng:click="stepPredicate = '-annotatedPattern'">Pattern</a>
+                                </th>
+                                <th class="usages last">
+                                    <a href id="usages-asc" class="ascending" ng:click="stepPredicate = 'usages.$size()'">Usages</a>
+                                    <a href id="usages-des" class="descending" ng:click="stepPredicate = '-usages.$size()'">Usages</a>
+                                </th>
+                            </tr>
+                            <tr class="filters">
+                                <th>
+                                    <select ng:init="stepSearch.type = ''" name="stepSearch.type" class="filterInput">
+                                        <option value="" selected="selected">- All -</option>
+                                        <option selected>Given</option>
+                                        <option selected>When</option>
+                                        <option selected>Then</option>
+                                    </select>
+                                </th>
+                                <th><input name="stepSearch.annotatedPattern" class="filterInput"/></th>
+                                <th>&nbsp;</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng:repeat="match in data.xref.stepMatches.$filter(stepSearch).$orderBy(stepPredicate)">
+                                <td class="type">{{match.type}}</td>
+                                <td class="pattern">{{match.annotatedPattern}}</td>
+                                <td class="size">{{match.usages.$size()}}</td>
+                                <!--
+                                <td class="size">{{match.usages[0].story}}</td>
+                                -->
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>    
+                
+                <div id="tabs-6">
+                    <div id="sectionStats">Service Statistics 
+                        <p id="sectionNote">Stats from {{root.stats.fromWhen}} to {{root.stats.toWhen}} for {{root.stats.serverName}}</p>
+                    </div>
+                    <table cellspacing="0" cellpadding="0">
+                        <thead>
+                            <tr class="columnTitles">
+                                <th class="url first">
+                                    <span class="header">URL</span>
+                                </th>
+                                <th class="service">
+                                    <span class="header">Service</span>
+                                </th>
+                                <th class="class">
+                                    <span class="header">Class</span>
+                                </th>
+                                <th class="method">
+                                    <span class="header">Method</span>
+                                </th>
+                                <th class="successful" colspan="5" style="text-align: center;">
+                                    <span class="header">Successful</span>
+                                </th>
+                                <th class="average" style="text-align: center;">
+                                    <span class="header">Average</span>
+                                </th>
+                                <th class="failing" style="text-align: center;">
+                                    <span class="header">Failing</span>
+                                </th>
+                                <th class="timedout last" style="text-align: center;">
+                                    <span class="header">Timed&nbsp;Out</span>
+                                </th>
+                            </tr>
+                            <tr class="filters">
+                                <th class="url" rowspan="2">
+                                    <input style="width: 90%;" name="searchStat.url" class="filterInput"/>
+                                </th>
+                                <th class="service" rowspan="2">
+                                    <input style="width: 90%;" name="searchStat.serviceName" class="filterInput"/>
+                                </th>
+                                <th class="class" rowspan="2">
+                                    <input style="width: 90%;" name="searchStat.className" class="filterInput"/>
+                                </th>
+                                <th class="method" rowspan="2">
+                                    <input style="width: 90%;" name="searchStat.method" class="filterInput"/>
+                                </th>
+                                <th class="successful statsHead" colspan="5" style="text-align: center;">(seconds)</th>
+                                <th class="average statsHead" style="text-align: center;" rowspan="2">(seconds)</th>
+                                <th class="failing statsHead" style="text-align: center;" rowspan="2">(count)</th>
+                                <th class="timedout statsHead" style="text-align: center;" rowspan="2">(count)</th>
+                            </tr>
+                            <tr class="filters">
+                                <th class="statsHead">0-1</th>
+                                <th class="statsHead">1-2</th>
+                                <th class="statsHead">2-5</th>
+                                <th class="statsHead">5-10</th>
+                                <th class="statsHead">10+</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng:repeat="entry in root.stats.entries.$filter(searchStat)">
+                                <td class="url" style="word-wrap: break-word; max-width: 3cm !important;">{{entry.url}}</td>
+                                <td class="service" style="word-wrap: break-word">{{entry.serviceName}}</td>
+                                <td class="class" style="word-wrap: break-word">{{entry.className}}</td>
+                                <td class="method" style="word-wrap: break-word; max-width: 3.2cm !important;">{{entry.method}}</td>
+                                <td style="text-align: center;">{{entry.successful.counts[0]}}</td>
+                                <td style="text-align: center;">{{entry.successful.counts[1]}}</td>
+                                <td style="text-align: center;">{{entry.successful.counts[2]}}</td>
+                                <td style="text-align: center;">{{entry.successful.counts[3]}}</td>
+                                <td style="text-align: center;">{{entry.successful.counts[4]}}</td>
+                                <td class="average" style="text-align: center;">{{entry.average}}</td>
+                                <td class="failing" style="text-align: center;">{{entry.failing}}</td>
+                                <td class="timedout" style="text-align: center;">{{entry.timedOut}}</td>
+                            </tr>
+                        </tbody>
+                        <tfoot>
+                            <tr><td colspan="12">&nbsp;</td></tr>
+                        </tfoot>
+                    </table>
+                </div>
+
+                <div id="tabs-7">
+                   <p>The two home-pages linked to below were saved (including images etc) at the end of the Jenkins job, whether that job failed or passed:</p><br/>
+                   <a href="homepage/index.html">Southwest</a><br/><br/>
+                   <a href="swabiz_homepage/index.html">Swabiz</a>
+                </div>                              
+                              
+            </div>
+        </div>
+
+        <!--div id="footer">
+            <div class="left">Generated on 09/02/2011 13:41:59</div>
+            <div class="right">JBehave &#169; 2003-2010</div>
+            <div class="clear"></div>
+        </div-->
+
+      <div style="clear: both;"></div>
+
+    </div>
+</div>
+<script type="text/javascript">unhideStatus();</script>
+<script type="text/javascript">showHints();</script>
+</body>
+</html>

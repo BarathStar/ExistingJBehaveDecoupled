@@ -1,0 +1,9 @@
+RULE inject HibernateException on CarReservationStoreImpl
+CLASS com.swacorp.service.carhotel.dao.CarReservationStoreImpl
+METHOD save
+AT EXIT
+IF true
+DO
+    traceln("Byteman injecting HibernateException on calling to CarReservationStoreImpl.save()");
+    throw new org.hibernate.HibernateException("injecting simulated HibernateException on calling to CarReservationStoreImpl.save()");
+ENDRULE

@@ -1,0 +1,9 @@
+RULE inject HibernateException on HotelRatingStore.findById
+INTERFACE com.swacorp.service.hotel.dao.HotelRatingStore
+METHOD findById
+AT EXIT
+IF true
+DO
+    traceln("Byteman injecting HibernateException on calling to HotelRatingStore.findById");
+    throw new org.hibernate.HibernateException("Database Down!");
+ENDRULE

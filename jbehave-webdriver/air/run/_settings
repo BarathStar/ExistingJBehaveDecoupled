@@ -1,0 +1,17 @@
+export REGION=${REGION:-"us_standard"}
+export storyTimeoutInSecs=${storyTimeoutInSecs:-5400} #1.5H, some are running more than an hour and succeeding
+export threads=${threads:-50}
+export targetSystemDotcom=${targetSystemDotcom:-`hostname`}
+export targetSystemSwabiz=${targetSystemSwabiz:-$targetSystemDotcom}
+export domainToTestDotcom=${domainToTestDotcom:-"${targetSystemDotcom}.swacorp.com"}
+export domainToTestSwabiz=${domainToTestSwabiz:-"swabiz-${targetSystemSwabiz}.swacorp.com"}
+export httpProxy=${httpProxy:-'ec2-107-22-225-255.compute-1.amazonaws.com:9999'}
+export remoteWebDriverURL=${remoteWebDriverURL:-'http://ec2-107-22-225-255.compute-1.amazonaws.com:80/wd/hub'}
+export browserVersion=${browserVersion:-10}
+#export EXTRA_MVN_DEFINES=${EXTRA_MVN_DEFINES:-'-Dvid.cap -Dlocal.screenshots'}
+export EXTRA_MVN_DEFINES=${EXTRA_MVN_DEFINES:-''}
+export MAVEN_OPTS="-Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=8000 -Xnoagent -Djava.compiler=NONE -Dstory.log -XX:MaxPermSize=512m"
+
+if [ -r "run/_overrides" ]
+    then . run/_overrides
+fi

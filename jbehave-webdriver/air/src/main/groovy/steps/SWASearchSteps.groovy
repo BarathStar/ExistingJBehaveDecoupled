@@ -1,0 +1,127 @@
+package steps
+
+import com.swacorp.dotcom.webscenarios.air.Data
+import pages.elements.FlightSearchForm
+import pages.elements.RapidRewardsAccountBar
+import pages.SWASearchPage
+import state.Flow
+import state.PassengerData
+import util.CustomerInfoData
+import util.ItineraryData
+import org.jbehave.core.annotations.*
+import pages.*
+
+class SWASearchSteps {
+
+    private final static HOME_PAGE_SUBMIT_BUTTON = "booking_widget_content_row_btn_search"
+    private final static TRIP_SEARCH_MODAL_SUBMIT_BUTTON = "tripSearchModalSubmit"
+    private final static BS = "BusinessSelect"
+    private final static WGA = "WannaGetAway"
+    private final static AT = "Anytime"
+    private final static NS = "Nonstop"
+    SearchFlightsPage searchFlightsPage
+    SWASearchPage searchPage
+    SelectFlightsPage selectFlightsPage
+    FlightSearchForm flightSearchForm
+    OutboundAndReturnDatesAndPopUp calendarPopUp
+    ItineraryData itineraryData
+    Itinerary itinerary
+    ViewReservationPage viewReservationPage
+    Data data
+    PassengerData passengerData
+    HomePage homePage
+    Flow flow
+    CustomerInfoData customerInfoData
+    RapidRewardsAccountBar rapidRewardsAccountBar
+
+
+    @Given("I want to book a \$TripType flight")
+    def selectTrip(@Named("TripType") String trip_type) {
+        searchPage.selectTripType(trip_type)
+
+    }
+
+    @Given("The flight is an airtran flight")
+    def airtranFlight() {
+        searchPage.setAirtranFlight()
+    }
+
+    @Given("The outbound carrier type is \$OutboundCarrierType")
+    def outCarrier(@Named("OutboundCarrierType") String outbound_carrier_type) {
+        searchPage.selectOutBoundCarrierType(outbound_carrier_type)
+    }
+
+    @Given("The inbound carrier type is \$InboundCarrierType")
+    def inCarrier(@Named("InboundCarrierType") String inbound_carrier_type) {
+        searchPage.selectInBoundCarrierType(inbound_carrier_type)
+    }
+
+    @Given("The flight is an airtran \$tripType flight")
+    def airtranTrip(@Named("tripType") String tripType) {
+        searchPage.selectAirtranTrip(tripType)
+    }
+
+    @Given("The departure city is \$DepartureCity")
+    def fromTrip(@Named("DepartureCity") String departure_city) {
+        searchPage.selectDepartureLocation(departure_city)
+    }
+
+    @Given("The arrival city is \$ArrivalCity")
+    def toTrip(@Named("ArrivalCity") String arrival_city) {
+        searchPage.selectArrivalLocation(arrival_city)
+    }
+
+    @Given("The return city is \$ReturnCity")
+    def arrivalTrip(@Named("ReturnCity") String return_city) {
+        searchPage.selectReturnLocation(return_city)
+    }
+
+    @Given("The outbound trip type is \$OutboundRouteType")
+    def obTrip(@Named("OutboundRouteType") String outbound_route_type) {
+        searchPage.selectOutBoundTripType(outbound_route_type)
+    }
+
+    @Given("The inbound trip type is \$InboundRouteType")
+    def ibTrip(@Named("InboundRouteType") String inbound_route_type) {
+        searchPage.selectInBoundTripType(inbound_route_type)
+    }
+
+    @Given("The outbound fare type is \$OutboundFareType")
+    def selectOutBoundFare(@Named("OutboundFareType") String outbound_fare_type) {
+        searchPage.selectOutBoundFareType(outbound_fare_type)
+    }
+
+    @Given("The inbound fare type is \$InboundFareType")
+    def selectOneWayFare(@Named("InboundFareType") String inbound_fare_type) {
+        searchPage.selectInBoundFareType(inbound_fare_type)
+    }
+
+    @Given("Book the ticket for \$PassengerCount {passenger|passengers} with passenger type \$PassengerType")
+    def selectPassengers(@Named("PassengerCount ") int passenger_count ,@Named("PassengerType") String passenger_type)
+    {
+        searchPage.selectPassengers(passenger_count,passenger_type)
+    }
+
+    @Given("The flight is eligible for check in")
+    def setFlightThatIsEligibleForCheckin(){
+        searchPage.setFlightEligibleForCheckin()
+    }
+
+    @Given("Book the ticket using promocode \$PromoCode")
+    def specifiedPromoCode(@Named("PromoCode")  String promo_code){
+        searchPage.specifiedPromoCode(promo_code)
+    }
+
+    @Given("Book the ticket using fare in \$CurrencyType")
+    @When("Book the ticket using fare in \$CurrencyType")
+    void chooseFaresIn(@Named("CurrencyType")  String currency_type) {
+        searchPage.bookedFlightWithCurrency(currency_type)
+    }
+
+
+    @Given("I search the flight")
+    def selectRoundTripCitiesWithFare() {
+        searchPage.searchFlight()
+    }
+
+}

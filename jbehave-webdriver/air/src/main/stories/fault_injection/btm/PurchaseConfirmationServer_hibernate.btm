@@ -1,0 +1,7 @@
+RULE inject hibernate exception into PurchaseConfirmationServer
+CLASS com.swacorp.service.flightReservationService.impl.PurchaseConfirmationServer
+METHOD getConfirmationGroup(ShoppingCart,PurchaseConfirmationRequest, CarPurchase, CarSearchCriteria, HotelPurchase,HotelSearchCriteria, SodaEligibleItinerary, byte[], Customer, Trip, List, boolean, String)
+AT EXIT
+IF true
+DO throw new org.hibernate.HibernateException("Injected JUNK!!");
+ENDRULE

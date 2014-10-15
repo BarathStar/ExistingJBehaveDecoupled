@@ -1,0 +1,14 @@
+user:
+  rrnumber: 660
+  password: randomstring
+
+flights:
+  - origin: LAS
+    destination: MSY
+    departureDate: 06/23/2011
+    returnDate: 08/23/2011
+
+  - origin: MDW
+    destination: DTW
+    departureDate: 08/23/2011
+    returnDate: 11/01/2011

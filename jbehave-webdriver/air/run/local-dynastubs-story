@@ -1,0 +1,18 @@
+#!/bin/bash
+export basedir="$HOME/work/commerce-project/jbehave-webdriver/air"
+cd $HOME/work/commerce-project/jbehave-webdriver/air || $( echo "could not cd to $basedir" && exit 2 )
+. run/_settings
+
+mvn -e clean install \
+-Pjbehave-story-run \
+${browserVersion:+-Dbrowser.version=${browserVersion:-10} }\
+${domainToTestDotcom:+-DdomainToTest=${domainToTestDotcom} }\
+${domainToTestSwabiz:+-DswabizDomainToTest=${domainToTestSwabiz} }\
+${storyTimeoutInSecs:+-DstoryTimeoutInSecs=${storyTimeoutInSecs:-1200} }\
+${threads:+-Dthreads=${threads:-1} }\
+${EXTRA_MVN_DEFINES:+$EXTRA_MVN_DEFINES }\
+\
+-DDYNA_STUBS \
+-DCR1_SEAT_SELECTION \
+-DstoryFilter=view_FLWN_WNFL_round_trip_itinerary_on_price_page.story \
+$*

@@ -1,0 +1,31 @@
+package util
+
+class PageName {
+
+    public static final String HOME = "Home Page"
+    public static final String HOME2 = "Home Page 2"
+    public static final String CONTACT_US = "Contact Us"
+    public static final String SELECT_FLIGHTS = "Select Flights Page"
+    public static final String PRICE_PAGE = "Price Page"
+    public static final String PURCHASE_PAGE = "Purchase Page"
+    public static final String CONFIRMATION_PAGE = "Confirmation Page"
+    public static final String VIEW_RESERVATION_PAGE = "View reservation Page"
+    public static final String PLAN_TRIP_PAGE = "Plan Trip Page"
+    public static final String CHANGE_AIR_RESERVATION = "Change View reservation Page"
+    public static final String SELECT_FLIGHTS_TO_CHANGE = "Select Flights To Change Page"
+    public static final String CHANGE_TRIP = "Change Trip Page"
+    public static final String SELECT_NEW_FLIGHTS = "Select New Flights Page"
+    public static final String NEW_PRICE_PAGE = "New Price Page"
+    public static final String RECONCILE_PAGE = "Reconcile Page"
+    public static final String CHECKIN_ONLINE = "Checkin online Page"
+    public static final String SELECT_PRINT_DOCUMENT = "Select Print Document Page"
+    public static final String CANCEL_AIR_RESERVATION = "Cancel air reservation page"
+    public static final String CANCEL_RESERVATION_RETRIEVED = "Cancel reservation retrieved page"
+    public static final String CANCEL_RESERVATION_CONFIRMATION = "Cancel reservation confirmation page"
+    public static final String ADD_RAPID_REWARDS = "Add Rapid Rewards page"
+    public static final String ADD_RAPID_REWARDS_NUMBER = "Add Rapid Rewards Number page"
+    public static final String ADD_RAPID_REWARDS_NUMBER_CONFIRMATION = "Add Rapid Rewards Number confirmation page"
+    public static final String SELECT_FLIGHTS_TO_UPGRADE = "Select flights to upgrade page"
+    public static final String UNACCOMPANIED_MINOR_PAGE = "Unaccompanied Minor Page"
+    public static final String DISABILITIES_PAGE = "Disabilities page"
+}

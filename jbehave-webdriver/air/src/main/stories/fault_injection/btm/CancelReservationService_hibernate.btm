@@ -1,0 +1,7 @@
+RULE trace exception CancelReservationService
+CLASS com.swacorp.service.flightReservationService.impl.CancelReservationService
+METHOD cancelReservation(CancelableReservation, Boolean)
+AT ENTRY
+IF true
+DO throw new org.hibernate.HibernateException("Injected JUNK!!");
+ENDRULE

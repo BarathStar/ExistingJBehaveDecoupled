@@ -1,0 +1,19 @@
+#!/bin/bash
+cd "../$( dirname "${BASH_SOURCE[0]}" )" && pwd
+. run/_settings
+
+java $JAVA_OPTS \
+${httpProxy:+-DHTTP_PROXY=${httpProxy} }\
+${remoteWebDriverURL:+-DREMOTE_WEBDRIVER_URL=${remoteWebDriverURL} }\
+${browserVersion:+-Dbrowser.version=${browserVersion:-10} }\
+${domainToTestDotcom:+-DdomainToTest=${domainToTestDotcom} }\
+${domainToTestSwabiz:+-DswabizDomainToTest=${domainToTestSwabiz} }\
+${storyTimeoutInSecs:+-DstoryTimeoutInSecs=${storyTimeoutInSecs:-3400} }\
+${threads:+-Dthreads=${threads:-1} }\
+${EXTRA_MVN_DEFINES:+$EXTRA_MVN_DEFINES }\
+\
+-Dmeta.filter="groovy: flow == 'air' && process == 'booking' && dyna_stubs && not_passing == false && suite == false && project_in_dev == false && seatSelection == false && accordion_purchase_page == false && airTranOnly == false && !removedFromAirbooking && !points_dot_com_off" \
+-DDYNA_STUBS \
+-jar target/commerce-air-scenarios-1.0-SNAPSHOT-jar-with-dependencies.jar \
+$* 2>&1 | tee /tmp/$0.log
+

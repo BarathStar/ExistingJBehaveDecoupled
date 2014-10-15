@@ -1,0 +1,9 @@
+itineraryType: Round Trip
+departureStation: MDW
+arrivalStation: DAL
+departingFlight_airlineName: Southwest Airlines
+departingFlight_carrierCode: WN
+departingFlight_fareClass: Anytime
+arrivingFlight_airlineName: Southwest Airlines
+arrivingFlight_carrierCode: WN
+arrivingFlight_fareClass: Anytime

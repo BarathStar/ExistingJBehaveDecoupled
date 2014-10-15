@@ -1,0 +1,20 @@
+#!/bin/bash
+cd "../$( dirname "${BASH_SOURCE[0]}" )" && pwd
+. run/_settings
+export BTM_PORT=9292
+mvn -e clean install \
+-Pjbehave-story-run \
+${httpProxy:+-DHTTP_PROXY=${httpProxy} }\
+${remoteWebDriverURL:+-DREMOTE_WEBDRIVER_URL=${remoteWebDriverURL} }\
+${browserVersion:+-Dbrowser.version=${browserVersion:-10} }\
+${domainToTestDotcom:+-DdomainToTest=${domainToTestDotcom} }\
+${domainToTestSwabiz:+-DswabizDomainToTest=${domainToTestSwabiz} }\
+${storyTimeoutInSecs:+-DstoryTimeoutInSecs=${storyTimeoutInSecs:-1200} }\
+${threads:+-Dthreads=${threads:-1} }\
+${EXTRA_MVN_DEFINES:+$EXTRA_MVN_DEFINES }\
+-Dmeta.filter="groovy: suite == 'faultInjection' && !not_passing && dyna_stubs" \
+-Dfault.testing \
+-DDYNA_STUBS \
+-DBTM_PORT=${BTM_PORT} \
+$*
+exit 0

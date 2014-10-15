@@ -1,0 +1,129 @@
+RULE trace exception MaOpsStationInfoOpsGetRoutes
+CLASS com.swacorp.service.flightShoppingService.impl.MaOpsStationInfoOperationsImpl
+METHOD getRoutes(String)
+AT ENTRY
+IF true
+DO throw new com.swacorp.common.exception.CsOPsInvalidClassAccessException("com.swacorp.service.flightShoppingService.impl.MaOpsStationInfoOperationsImpl.getRoutes.invalidClass");
+ENDRULE
+#################################################################################
+RULE trace exception MaOpsServiceAdjustLocalTimeToAirportTime
+CLASS com.swacorp.service.flightShoppingService.impl.MaOpsService
+METHOD adjustAirportTimeToLocalTime(String,int)
+AT ENTRY
+IF true
+DO throw new com.swacorp.common.exception.CsOPsInvalidClassAccessException("com.swacorp.service.flightShoppingService.impl.MaOpsService.adjustLocalTimeToAirportTime.invalidClass");
+ENDRULE
+#################################################################################
+RULE trace exception MaOpsServiceGetAirportsByTextAllLocations
+CLASS com.swacorp.service.flightShoppingService.impl.MaOpsService
+METHOD getAirportsByTextAllLocations(String)
+AT ENTRY
+IF true
+DO throw new com.swacorp.common.exception.CsOPsInvalidClassAccessException("com.swacorp.service.flightShoppingService.impl.MaOpsService.getAirportsByTextAllLocations.invalidClass");
+ENDRULE
+#################################################################################
+RULE trace exception MaOpsServiceGetBestPriceFareCombination
+CLASS com.swacorp.service.flightShoppingService.impl.MaOpsService
+METHOD getBestPriceFareCombination(MaBestPriceSegmentRequest[],MaBestPriceTripResponseHolder)
+AT ENTRY
+IF true
+DO throw new com.swacorp.common.exception.CsOPsInvalidClassAccessException("com.swacorp.service.flightShoppingService.impl.MaOpsService.getBestPriceFareCombination.invalidClass");
+ENDRULE
+#################################################################################
+RULE trace exception MaOpsServiceGetICSTrips
+CLASS com.swacorp.service.flightShoppingService.impl.MaOpsService
+METHOD getICSTrips(String,String,int)
+AT ENTRY
+IF true
+DO throw new com.swacorp.common.exception.CsOPsInvalidClassAccessException("com.swacorp.service.flightShoppingService.impl.MaOpsService.getICSTrips.invalidClass");
+ENDRULE
+#################################################################################
+RULE trace exception MaOpsServiceGetMinCnxTime
+CLASS com.swacorp.service.flightShoppingService.impl.MaOpsService
+METHOD getMinCnxTime(String,String,String)
+AT ENTRY
+IF true
+DO throw new com.swacorp.common.exception.CsOPsInvalidClassAccessException("com.swacorp.service.flightShoppingService.impl.MaOpsService.getMinCnxTime.invalidClass");
+ENDRULE
+#################################################################################
+RULE trace exception MaOpsServiceGetMultiDayValidFaredForTrip
+CLASS com.swacorp.service.flightShoppingService.impl.MaOpsService
+METHOD getMultiDayValidFaresForTrip(MaValidFareTripSegmentRequest[],int,boolean)
+AT ENTRY
+IF true
+DO throw new com.swacorp.common.exception.CsOPsInvalidClassAccessException("com.swacorp.service.flightShoppingService.impl.MaOpsService.getMultiDayValidFaresForTrip.invalidClass");
+ENDRULE
+#################################################################################
+RULE trace exception MaOpsServiceGetOpenScheduleDates
+CLASS com.swacorp.service.flightShoppingService.impl.MaOpsService
+METHOD getOpenScheduleDates()
+AT ENTRY
+IF true
+DO throw new com.swacorp.common.exception.CsOPsInvalidClassAccessException("com.swacorp.service.flightShoppingService.impl.MaOpsService.getOpenScheduleDates.invalidClass");
+ENDRULE
+#################################################################################
+RULE trace exception MaOpsServiceGetValidFaresForTrip
+CLASS com.swacorp.service.flightShoppingService.impl.MaOpsService
+METHOD getValidFaresForTrip(String,String,LocalDate)
+AT ENTRY
+IF true
+DO throw new com.swacorp.common.exception.CsOPsInvalidClassAccessException("com.swacorp.service.flightShoppingService.impl.MaOpsService.getValidFaresForTrip.invalidClass");
+ENDRULE
+#################################################################################
+RULE trace exception MaOpsStationInfoOpsGetEnhancedRoutes
+CLASS com.swacorp.service.flightShoppingService.impl.MaOpsStationInfoOperationsImpl
+METHOD getEnhancedRoutes(String)
+AT ENTRY
+IF true
+DO throw new com.swacorp.common.exception.CsOPsInvalidClassAccessException("com.swacorp.service.flightShoppingService.impl.MaOpsStationInfoOperationsImpl.getEnhancedRoutes.invalidClass");
+ENDRULE
+#################################################################################
+RULE trace exception RoutingInfoCacheServiceGetEnhancedRoutes
+CLASS com.swacorp.service.flightScheduleService.impl.RoutingInfoCacheService
+METHOD getEnhancedRoutes()
+AT ENTRY
+IF true
+DO throw new com.swacorp.common.exception.CsOPsInvalidClassAccessException("com.swacorp.service.flightScheduleService.impl.RoutingInfoCacheService.getEnhancedRoutes.invalidClass");
+ENDRULE
+#################################################################################
+RULE trace exception RoutingInfoCacheServiceGetRoutes
+CLASS com.swacorp.service.flightScheduleService.impl.RoutingInfoCacheService
+METHOD getRoutes()
+AT ENTRY
+IF true
+DO throw new com.swacorp.common.exception.CsOPsInvalidClassAccessException("com.swacorp.service.flightShoppingService.impl.RoutingInfoCacheService.getRoutes.invalidClass");
+ENDRULE
+#################################################################################
+RULE trace exception RoutingInfoServiceGetEnhancedRoutes
+CLASS com.swacorp.service.flightScheduleService.impl.RoutingInfoService
+METHOD getEnhancedRoutes()
+AT ENTRY
+IF true
+DO throw new com.swacorp.common.exception.CsOPsInvalidClassAccessException("com.swacorp.service.flightScheduleService.impl.RoutingInfoService.getEnhancedRoutes.invalidClass");
+ENDRULE
+#################################################################################
+RULE trace exception RoutingInfoServiceGetRoutes
+CLASS com.swacorp.service.flightScheduleService.impl.RoutingInfoService
+METHOD getRoutes()
+AT ENTRY
+IF true
+DO throw new com.swacorp.common.exception.CsOPsInvalidClassAccessException("com.swacorp.service.flightShoppingService.impl.RoutingInfoService.getRoutes.invalidClass");
+ENDRULE
+##################################################################################
+RULE trace exception RoutingInfoServiceGetServiceState
+CLASS com.swacorp.service.flightScheduleService.impl.RoutingInfoService
+METHOD getServiceState(String,String,LocalDate)
+AT ENTRY
+IF true
+DO throw new com.swacorp.common.exception.CsOPsInvalidClassAccessException("com.swacorp.service.flightShoppingService.impl.RoutingInfoService.getServiceState.invalidClass");
+ENDRULE
+##################################################################################
+RULE trace exception RoutingInfoServiceGetServiceStateStr
+CLASS com.swacorp.service.flightScheduleService.impl.RoutingInfoService
+METHOD getServiceState(String,String)
+AT ENTRY
+IF true
+DO throw new com.swacorp.common.exception.CsOPsInvalidClassAccessException("com.swacorp.service.flightShoppingService.impl.RoutingInfoService.getServiceState.invalidClass");
+ENDRULE
+###################################################################################
+

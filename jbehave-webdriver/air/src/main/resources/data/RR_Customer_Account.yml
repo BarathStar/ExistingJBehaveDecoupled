@@ -1,0 +1,12 @@
+firstName: Customer
+lastName: User
+email: customerUser@wnco.com
+birthMonth: 1
+birthDay: 1
+birthYear: 1991
+gender: Male
+securityAnswer: asd
+securityAnswer2: asd
+city: Dallas
+state: TX
+userType: Customer

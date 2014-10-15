@@ -1,0 +1,12 @@
+.idea
+*.xcodeproj
+*.iml
+*.ipr
+*.iws
+*.ids
+*.log
+target/
+sauce_connect.log.*
+.project
+.classpath
+.settings/

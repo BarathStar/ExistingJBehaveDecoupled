@@ -1,0 +1,137 @@
+To run any jbehave tests locally you will need to have started the web and service tiers
+
+To run the jbehave smoke tests locally
+    1. navigate to /home/developer/work/commerce-git/jbehave-webdriver/air
+    2. run the smoke shell script with the command: ./smoke.sh
+If you want to see the details of running smoke simply examine this shell script
+
+mvn clean install
+
+  ... runs the tests
+
+To NOT return PNRs to SAAS after use (you are stubbing), add:
+
+  -DdontReturnPNRsToSaas
+
+To subset tests based on meta filter:
+
+  -Dmeta.filter="groovy: suite == 'smoke' && not_passing == false"
+
+   or -Dmeta.filter="groovy: suite == 'smoke' && \!not_passing"
+
+   This runs the smoke suite, omitting tests with the not_passing tag present.
+   Groovy is the 'little language' that is used to match on meta-tags.  It's a real Groovy expression, so
+   the likes of && || ( ) == and != all have meaning.  Be careful of != though, from bash as it might
+   need to be escaped with a backslash.
+
+To limit the flight schedule dates to avoid lack of schedule data:
+
+   -DscheduleCutoffDate=1/6/2012
+
+   (the format is mm/dd/YYYY for the date)
+
+   Note: These dates change as the schedules are updated in the system; emails will be sent to notify when these
+         dates need to change; remember to change performance and all other non-radiator Jenkins jobs as well
+
+To a domain other than local.swacorp.com:
+
+  -DdomainToTest=www.southwest.com -DserviceJmxPort=JMX_SVC_PORT -DjmxPort=JMX_WEB_PORT
+
+  Use the correct service and web JMX ports for internal usage. Defaults are already set for localhost.
+  (credit cards and JMX tests thankfully fail in production)
+
+To a swabiz domain other than local.swabizdev.swacorp.com:
+
+  -DswabizDomainToTest=www.swabiz.com
+
+To aim at a single test:
+
+  -DstoryFilter=cancel_a_foobar
+
+If one of the REAL services is broken, you could switch to working with OLD stubs like so:
+
+  -DuseStubs
+
+
+If one of the REAL services is broken, you could switch to working with DYNA stubs like so:
+
+  -DDYNA_STUBS
+
+  (Tests that have Dyna Stubs services created for them are marked with the meta tag @dyna_stubs)
+
+If you are not running against a loyalty stack, specify:
+
+  -Dstack=Core
+
+If you want to test a non-localhost testing stack:
+
+  -DJBEHAVE_WEBDRIVER_FIREFOX_PROFILE=WebDriver_Insecure
+
+  You will need to have created a Firefox Profile called WebDriver_Insecure that has accepted the self-signed certs for the env's in question
+
+To leverage their stack you must stand up a tunnel with
+/work/trunk/commerce-project/jbehave-webdriver/Sauce-Connect/start.sh your_machines_saucelabs_account your_machines_saucelabs_access_key
+
+If you want to leverage SauceLabs's stack for parallelized testing, you'll need these for maven (see saucelabs.properties in this folder)
+
+  -DSAUCE_ACCESS_KEY=your_machines_saucelabs_access_key
+  -DSAUCE_USERNAME=your_machines_saucelabs_account
+  -Dthreads=10
+
+
+For SauceLabs, you can force jobs to timeout after a certain idle time like so:
+
+  -DBROWSER_IDLE_TIMEOUT
+  -DBROWSER_IDLE_TIMEOUT=100
+
+  (if no seconds amount specified 10 is used)
+  (you understand that stopping on a break-point is going to exacerbate timeout settings on SauceLabs)
+
+To prevent test suites from timing out locally you can use:
+
+   -DTimeoutInSecs=400000 (large number)
+
+To get through the CreditCard processing issue use the following toggles:
+
+  -DANTI_FRAUD_OFF
+  -DANTI_FRAUD_TOGGLE_SVC
+
+Make sure both ANTI Fraud toggles are off in the web and service layer, which can be done by going to JConsole.
+
+To gather Page performance info, the following can be used as so:
+
+-DSTORY_TIMEOUT_SECS=300
+-Dperf=netexport
+
+Example of full mvn line with switches:
+
+mvn clean install -DstoryFilter=example_performance_story -DCR1_TOGGLE -DAUTO_COMPLETE_ON -DSTORY_TIMEOUT_SECS=300 -Dperf=netexport
+
+Timeout specifies how long to wait before timing out on json creation.
+netexport specifies what file to log info to.
+
+Running jbehave headless:
+
+use the standard scripts with '-x' (ie. air/baseline.sh -x )
+There is also a script to run all the others one after another : air/runAllHeadless.sh
+
+To run with DynaStubs, run with:
+
+  -DDYNA_STUBS
+
+The capability of setting an environment has been implemented from the command line.  To set the env simply select
+one of the hangars listed below. If an env is not set a default(dev) env will be set.
+-Denv=(specify hangar here)
+
+Hangar
+H1 = SiebelQA6LoyaltyData
+H2 = SiebelQA1LoyaltyData
+H3 = SiebelQA7LoyaltyData
+H4 = SiebelQA3LoyaltyData
+H5 = SiebelQA2LoyaltyData
+efix = SiebelDevLoyaltyData
+Jupiter = SiebelDev6LoyaltyData
+Saturn = SiebelQA2LoyaltyData
+Uranus = SiebelDev1LoyaltyData
+Neptune = SiebelDev1LoyaltyData
+

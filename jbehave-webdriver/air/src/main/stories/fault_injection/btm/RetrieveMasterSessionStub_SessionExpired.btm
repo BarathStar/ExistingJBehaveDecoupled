@@ -1,0 +1,9 @@
+RULE inject SessionExpired exception to SessionManager Stub
+CLASS com.swacorp.service.storage.session.stub.SessionManagerStub
+METHOD retrieve
+AT EXIT
+IF true
+DO
+    traceln("Byteman injecting SessionExpired exception on call to SessionManagerStub.retrieve(SESSION_TYPE, String masterSessionId)");
+    throw new com.swacorp.common.exception.SessionExpiredException("Injected SessionExpiredException!!");
+ENDRULE

@@ -1,0 +1,52 @@
+Verify coming soon oops message when user books Inbound and Outbound after FL[I] ends and before WN[I] begins
+
+Meta:
+
+@project coda
+@flow air
+@process booking
+@user anonymous
+@traveler adult
+@dyna_stubs
+@not_live
+@project_in_dev
+@storyid DCAIR-8054
+
+Narrative:
+
+As a Customer
+I want to search for a WN/FL shared international city pair that Airtran has stopped serving and Southwest is yet to begin service for the requested outbound and inbound dates
+I will see an oops message that service is yet to begin
+
+Scenario: An adult searches for a Southwest International flight
+
+Given I have the following itinerary data:
+    |Field|Value|
+    |itineraryType|Round Trip|
+    |departureStation|DAL|
+    |arrivalStation|CUN|
+    |departureDate|+40|
+    |returnDate|+50|
+And The following routes are available:
+    |Field|Value|
+    |originStation|DAL|
+    |destinationStation|CUN|
+    |carrierDates|FL:F:[today,today+30]|
+And The following routes are available:
+    |Field|Value|
+    |originStation|CUN|
+    |destinationStation|DAL|
+    |carrierDates|FL:F:[today,today+30]|
+And The following routes are available:
+    |Field|Value|
+    |originStation|DAL|
+    |destinationStation|CUN|
+    |carrierDates|WN:F:[today+60,today+90]|
+And The following routes are available:
+    |Field|Value|
+    |originStation|CUN|
+    |destinationStation|DAL|
+    |carrierDates|WN:F:[today+60,today+90]|
+
+When I am searching flights from home page
+Then I see an Oops messages from search flight page indicating that Published scheduled service between (Dallas - DAL) and (Cancun - CUN) does not begin until

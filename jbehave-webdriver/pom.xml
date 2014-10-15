@@ -1,0 +1,66 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+            <artifactId>dotcom-parent</artifactId>
+            <groupId>com.swacorp.dotcom</groupId>
+            <version>14.8.0-SNAPSHOT</version>
+    </parent>
+
+   <groupId>com.swacorp.dotcom</groupId>
+    <artifactId>commerce-scenarios-parent</artifactId>
+    <packaging>pom</packaging>
+    <name>LeapFrog - Web-Scenarios (Parent Project)</name>
+
+    <scm>
+       <developerConnection>scm:git:http://stash.swacorp.com/scm/com/commerce-project.git
+       </developerConnection>
+    </scm>
+
+    <properties>
+    </properties>
+
+    <modules>
+        <module>air</module>
+    </modules>
+
+    <profiles>
+        <profile>
+            <id>connectria</id>
+
+            <distributionManagement>
+                <repository>
+                    <id>releases</id>
+                    <name>Internal Releases</name>
+                    <url>http://st1hlxsw57.swacorp.com:8080/nexus/content/repositories/releases</url>
+                </repository>
+
+                <snapshotRepository>
+                    <id>snapshots</id>
+                    <name>Snapshots</name>
+                    <url>http://st1hlxsw57.swacorp.com:8080/nexus/content/repositories/ci_snapshots</url>
+                </snapshotRepository>
+
+            </distributionManagement>
+        </profile>
+
+    </profiles>
+
+    <distributionManagement>
+        <repository>
+            <id>releases</id>
+            <name>Internal Releases</name>
+            <url>http://lfnexus.swacorp.com:8081/nexus/content/repositories/releases</url>
+        </repository>
+
+        <snapshotRepository>
+            <id>snapshots</id>
+            <name>Snapshots</name>
+            <url>http://lfnexus.swacorp.com:8081/nexus/content/repositories/snapshots</url>
+        </snapshotRepository>
+
+    </distributionManagement>
+
+</project>

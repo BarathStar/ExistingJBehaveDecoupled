@@ -1,0 +1,7 @@
+RULE trace exception RetrieveReservationServiceImpl
+CLASS com.swacorp.service.flightReservationService.impl.RetrieveReservationServiceImpl
+METHOD retrieveReservationForCheckIn(ReservationLookupCriteria)
+AT ENTRY
+IF true
+DO throw new java.lang.OutOfMemoryError();
+ENDRULE

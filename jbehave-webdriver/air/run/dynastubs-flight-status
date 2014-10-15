@@ -1,0 +1,18 @@
+#!/bin/bash
+cd "../$( dirname "${BASH_SOURCE[0]}" )" && pwd
+. run/_settings
+
+mvn -e clean install \
+-Pjbehave-story-run \
+${httpProxy:+-DHTTP_PROXY=${httpProxy} }\
+${remoteWebDriverURL:+-DREMOTE_WEBDRIVER_URL=${remoteWebDriverURL} }\
+${browserVersion:+-Dbrowser.version=${browserVersion:-10} }\
+${domainToTestDotcom:+-DdomainToTest=${domainToTestDotcom} }\
+${domainToTestSwabiz:+-DswabizDomainToTest=${domainToTestSwabiz} }\
+${storyTimeoutInSecs:+-DstoryTimeoutInSecs=${storyTimeoutInSecs:-1200} }\
+${threads:+-Dthreads=${threads:-1} }\
+${EXTRA_MVN_DEFINES:+$EXTRA_MVN_DEFINES }\
+\
+-Dmeta.filter="groovy: flow == 'air' && process == 'flight_status' && dyna_stubs && not_passing == false && suite == false && project_in_dev == false && seatSelection == false" \
+-DDYNA_STUBS \
+$* 2>&1 | tee /tmp/$0.log

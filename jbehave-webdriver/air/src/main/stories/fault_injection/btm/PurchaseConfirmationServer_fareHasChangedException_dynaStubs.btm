@@ -1,0 +1,7 @@
+RULE inject FareHasChangedException into PurchaseConfirmationClient
+CLASS com.swacorp.dotcom.consumer.PurchaseConfirmationClient
+METHOD getConfirmationGroup(ShoppingCart,PurchaseConfirmationRequest, CarPurchase, CarSearchCriteria, HotelPurchase,HotelSearchCriteria, SodaEligibleItinerary, byte[], Customer, Trip, List, boolean, String)
+AT EXIT
+IF true
+DO throw new com.swacorp.common.exception.FareHasChangedException();
+ENDRULE

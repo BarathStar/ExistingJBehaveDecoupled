@@ -1,0 +1,33 @@
+market :
+  default : &marketdefault
+    departAirport : DAL
+    arriveAirport : LAS
+    outboundConnectingStation : ANY
+    inboundConnectingStation : ANY
+  nonstop : *marketdefault
+  direct  : *marketdefault
+  connect : *marketdefault
+
+openjaw :
+  departAirport : LAS
+  arriveAirport : PHX
+  returnAirport : LAX
+
+oneway :
+  departAirport : LAS
+  arriveAirport : PHX
+
+roundtrip :
+  departAirport : LAS
+  arriveAirport : PHX
+
+codeShare :
+  departAirport : LAS
+  arriveAirport : ATL
+  southwestCarrier: WN
+  airtranCarrier: FL
+
+airtran :
+  departAirport : ATL
+  arriveAirport : LAX
+  carrier: FL

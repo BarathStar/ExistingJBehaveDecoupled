@@ -1,0 +1,46 @@
+<html>
+<head>
+    <title>Build Tree</title>
+    <script type="text/javascript" src="js/graph.js"></script>
+    <script type="text/javascript" src="js/jquery.js"></script>
+    <script type="text/javascript">
+        $.getJSON(buildUrl, function(data) {
+            var builds = data.builds
+            $.each(builds.reverse(), function(buildIndex, buildReference) {
+                var buildId = 'BUILD-' + buildReference.number;
+                $('<li/>', {
+                    html: '<a href="' + buildReference.url + '">' + buildReference.url + '</a>' +
+                            '<ul id="' + buildId + '"></ul>'
+                }).appendTo('#builds');
+
+                $.getJSON(buildReference.url + '/api/json', function(build) {
+                    $.each(build.artifacts, function(buildArtifactIndex, buildArtifactReference) {
+                        var artifactUrl = buildReference.url + 'artifact/' + buildArtifactReference.relativePath;
+                        var artifactId = buildId + '-ARTIFACT-' + buildArtifactIndex;
+                        $('<li/>', {
+                            html: '<li><a href="' + artifactUrl + '">' + buildArtifactReference.displayPath + '</a>' +
+                                    '<ul id="' + artifactId + '"></ul>'
+                        }).appendTo('#' + buildId);
+
+                        $.getJSON(artifactUrl, function(buildArtifact) {
+                            $('<li/>', {
+                                html: 'contentLoad:' + buildArtifact.log.pages[0].pageTimings.onContentLoad
+                            }).appendTo('#' + artifactId);
+                            chart.series[0].addPoint([buildIndex, buildArtifact.log.pages[0].pageTimings.onContentLoad])
+                        });
+
+                        $.getJSON(artifactUrl, function(buildArtifact) {
+                            $('<li/>', {
+                                html: 'load:' + buildArtifact.log.pages[0].pageTimings.onLoad
+                            }).appendTo('#' + artifactId);
+                        });
+                    });
+                });
+            });
+        });
+    </script>
+</head>
+<body>
+<ul id="builds"></ul>
+</body>
+</html>

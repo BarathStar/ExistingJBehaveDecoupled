@@ -1,0 +1,19 @@
+#!/bin/bash
+cd "../$( dirname "${BASH_SOURCE[0]}" )" && pwd
+. run/_settings
+
+mvn -e clean install \
+-Pjbehave-story-run \
+${httpProxy:+-DHTTP_PROXY=${httpProxy} }\
+${remoteWebDriverURL:+-DREMOTE_WEBDRIVER_URL=${remoteWebDriverURL} }\
+${browserVersion:+-Dbrowser.version=${browserVersion:-10} }\
+${domainToTestDotcom:+-DdomainToTest=${domainToTestDotcom} }\
+${domainToTestSwabiz:+-DswabizDomainToTest=${domainToTestSwabiz} }\
+${storyTimeoutInSecs:+-DstoryTimeoutInSecs=${storyTimeoutInSecs:-1200} }\
+${threads:+-Dthreads=${threads:-5} }\
+${EXTRA_MVN_DEFINES:+$EXTRA_MVN_DEFINES }\
+\
+-DDYNA_STUBS \
+-DANTI_FRAUD_TOGGLE_SVC -DPRICE_PAGE_CAR_CROSS_SELL_ON -DENHANCED_LAYOUT_HOTEL_CROSS_SELL_PRICE_PAGE_ON -DAGGRESSIVE_XSELL_MODAL_ON_SELECT_FLIGHTS_ENHANCED_DESIGN_ON -DEZREZ_UPSELL_ADDITIONAL_INFO_URL_ON \
+-Dmeta.filter="groovy: not_passing==false && project_in_dev && project == 'Flintstones_13.10' && dyna_stubs || acs_bs_modal" \
+$*

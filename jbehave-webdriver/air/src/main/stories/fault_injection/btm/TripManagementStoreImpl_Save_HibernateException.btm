@@ -1,0 +1,9 @@
+RULE inject hibernate exception into TripManagementStoreImpl
+CLASS com.swacorp.service.tripManagement.dao.TripManagementStoreImpl
+METHOD save(Object)
+AT EXIT
+IF true
+DO
+    traceln("Byteman injecting HibernateException on calling to TripManagementStoreImpl.save(Object)");
+    throw new org.hibernate.HibernateException("Byteman injecting HibernateException on calling to TripManagementStoreImpl.save(Object)");
+ENDRULE

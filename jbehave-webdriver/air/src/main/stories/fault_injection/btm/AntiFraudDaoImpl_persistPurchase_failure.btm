@@ -1,0 +1,15 @@
+RULE Enable AntiFraudService check in PurchaseConfirmationServer
+CLASS com.swacorp.service.flightReservationService.impl.PurchaseConfirmationServer
+METHOD isFraudCheckRequired(Purchase, WebsiteType)
+AT EXIT
+IF true
+DO return true;
+ENDRULE
+
+RULE trace exception AntiFraudDaoImpl
+CLASS com.swacorp.service.antifraud.dao.impl.AntiFraudDaoImpl
+METHOD persistPurchase(String, String, PurchaseHistory)
+AT ENTRY
+IF true
+DO throw new org.hibernate.HibernateException("Fault injected while persisting purchase history");
+ENDRULE

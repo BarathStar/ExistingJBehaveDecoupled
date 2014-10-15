@@ -1,0 +1,9 @@
+RULE inject UnableToCreateTokenException when the user tries to login
+CLASS com.swacorp.dotcom.login.impl.LoginService
+METHOD loginUsingAccountId
+AT ENTRY
+IF true
+DO
+   traceln("Byteman injecting UnableToCreateTokenException");
+   throw new com.swacorp.common.exception.UnableToCreateTokenException("UnableToCreateTokenException","The Username/Account Number and/or Password are incorrect.");
+ENDRULE

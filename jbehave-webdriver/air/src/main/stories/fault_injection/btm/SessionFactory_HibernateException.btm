@@ -1,0 +1,9 @@
+RULE inject HibernateException on SessionFactory.getCurrentSession()
+INTERFACE org.hibernate.SessionFactory
+METHOD getCurrentSession()
+AT EXIT
+IF true
+DO
+    traceln("Byteman injecting HibernateException on calling to SessionFactory.getCurrentSession()");
+    throw new org.hibernate.HibernateException("Database Down!");
+ENDRULE

@@ -1,0 +1,171 @@
+<html>
+<head>
+    <title>Air Purchase Flow Times</title>
+    <script type="text/javascript" src="js/jquery.js"></script>
+    <script type="text/javascript" src="js/highcharts.js"></script>
+    <script type="text/javascript">
+
+        $(document).ready(function() {
+
+            Highcharts.setOptions({
+                global: {
+                    useUTC: false
+                }
+            });
+
+            var chart = new Highcharts.Chart({
+                chart: {
+                    renderTo: 'chart',
+                    zoomType: 'x',
+                    defaultSeriesType: 'area'
+                },
+                title: {
+                    text: 'Air Purchase Flow'
+                },
+                subtitle: {
+                    text: 'production page load times'
+                },
+                xAxis: {
+                    title: {
+                        text: 'Time'
+                    },
+                    type: 'datetime',
+                    minPadding: 0.2,
+                    maxPadding: 0.2,
+                    maxZoom: 4 * 3600000 // four hours
+                },
+                yAxis: {
+                    title: {
+                        text: 'Seconds'
+                    },
+                    minPadding: 0.2,
+                    maxPadding: 0.2,
+                    maxZoom: 60,
+                    plotLines: [
+                        {
+                            value: 0,
+                            width: 1,
+                            color: '#808080'
+                        }
+                    ]
+                },
+                legend: {
+                    enabled: true
+                },
+                exporting: {
+                    enabled: false
+                },
+                tooltip: {
+                    shared: true,
+                    crosshairs: true
+                },
+                plotOptions: {
+                    area: {
+                        stacking: 'normal',
+                        lineColor: '#666666',
+                        lineWidth: 1,
+                        marker: {
+                            lineWidth: 1,
+                            lineColor: '#666666'
+                        }
+                    },
+                    series: {
+                        point: {
+                            cursor: 'pointer',
+                            events: {
+                                click: function(event) {
+                                    var clickedPoint = this;
+                                    window.open(clickedPoint.url);
+                                }
+                            }
+                        },
+                        marker: {
+                            lineWidth: 1
+                        }
+                    }
+                },
+                series: [
+                    {
+                        name: 'bookFlight',
+                        data: []
+                    },
+                    {
+                        name: 'priceFlight',
+                        data: []
+                    },
+                    {
+                        name: 'selectFlight',
+                        data: []
+                    },
+                    {
+                        name: 'homepage',
+                        data: []
+                    }
+                ]
+            });
+
+
+            $.getJSON(buildUrl, function(data) {
+                var builds = data.builds
+                $.each(builds.splice(0, getHowManyBuildsToDisplay()), function(buildIndex, buildReference) {
+                    var buildId = 'BUILD-' + buildReference.number;
+                    $.getJSON(buildReference.url + '/api/json', function(build) {
+                        var buildStartTime = build.timestamp;
+                        $.each(build.artifacts, function(buildArtifactIndex, buildArtifactReference) {
+                            if (buildArtifactReference.relativePath.match(/www\.southwest\.com\.json$/)) {
+                                var buildArtifactUrl = buildReference.url + 'artifact/' + buildArtifactReference.relativePath;
+                                var artifactId = buildId + '-ARTIFACT-' + buildArtifactIndex;
+                                $.getJSON(buildArtifactUrl, function(buildArtifact) {
+                                    chart.series[3].addPoint({
+                                        x: buildStartTime,
+                                        y: buildArtifact.log.pages[0].pageTimings.onContentLoad / 1000,
+                                        url: buildArtifactUrl
+                                    });
+                                });
+                            } else if (buildArtifactReference.relativePath.match(/flight\.select-flight\.html\.json$/)) {
+                                var buildArtifactUrl = buildReference.url + 'artifact/' + buildArtifactReference.relativePath;
+                                var artifactId = buildId + '-ARTIFACT-' + buildArtifactIndex;
+                                $.getJSON(buildArtifactUrl, function(buildArtifact) {
+                                    chart.series[2].addPoint({
+                                        x: buildStartTime,
+                                        y: buildArtifact.log.pages[0].pageTimings.onContentLoad / 1000,
+                                        url: buildArtifactUrl
+                                    });
+                                });
+                            } else if (buildArtifactReference.relativePath.match(/reservations\.price-reservations\.html\.json$/)) {
+                                var buildArtifactUrl = buildReference.url + 'artifact/' + buildArtifactReference.relativePath;
+                                var artifactId = buildId + '-ARTIFACT-' + buildArtifactIndex;
+                                $.getJSON(buildArtifactUrl, function(buildArtifact) {
+                                    chart.series[1].addPoint({
+                                        x: buildStartTime,
+                                        y: buildArtifact.log.pages[0].pageTimings.onContentLoad / 1000,
+                                        url: buildArtifactUrl
+                                    });
+                                });
+                            } else if (buildArtifactReference.relativePath.match(/reservations\.book-reservations\.html\.json$/)) {
+                                var buildArtifactUrl = buildReference.url + 'artifact/' + buildArtifactReference.relativePath;
+                                var artifactId = buildId + '-ARTIFACT-' + buildArtifactIndex;
+                                $.getJSON(buildArtifactUrl, function(buildArtifact) {
+                                    chart.series[0].addPoint({
+                                        x: buildStartTime,
+                                        y: buildArtifact.log.pages[0].pageTimings.onContentLoad / 1000,
+                                        url: buildArtifactUrl
+                                    });
+                                });
+                            }
+
+                        });
+                    });
+                });
+            });
+
+
+        });
+
+    </script>
+    <script type="text/javascript" src="js/graph.js"></script>
+</head>
+<body>
+<div id="chart"></div>
+</body>
+</html>

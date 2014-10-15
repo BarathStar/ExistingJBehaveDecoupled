@@ -1,0 +1,30 @@
+#!/bin/bash
+cd "../$( dirname "${BASH_SOURCE[0]}" )" && pwd
+. run/_settings
+
+if [ -z "$1" ]
+then
+   echo "You must provide a story name"
+   exit 2
+else
+   export storyFilter="$1"
+   shift
+fi
+
+mvn -e clean install \
+-Pjbehave-story-run \
+${browserVersion:+-Dbrowser.version=${browserVersion:-10} }\
+${domainToTestDotcom:+-DdomainToTest=${domainToTestDotcom} }\
+${domainToTestSwabiz:+-DswabizDomainToTest=${domainToTestSwabiz} }\
+${storyTimeoutInSecs:+-DstoryTimeoutInSecs=${storyTimeoutInSecs:-1200} }\
+${threads:+-Dthreads=${threads:-1} }\
+${EXTRA_MVN_DEFINES:+$EXTRA_MVN_DEFINES }\
+\
+-Dmeta.filter="groovy: dyna_stubs" \
+${storyFilter:+-DstoryFilter=${storyFilter} }\
+-DDYNA_STUBS \
+$* 2>&1 | tee /tmp/$0.log
+
+# removed, since you probably want to run this locally anyway
+#${httpProxy:+-DHTTP_PROXY=${httpProxy} }\
+#${remoteWebDriverURL:+-DREMOTE_WEBDRIVER_URL=${remoteWebDriverURL} }\

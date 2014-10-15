@@ -1,0 +1,23 @@
+RULE inject delay into PurchaseConfirmationServer
+CLASS com.swacorp.service.flightReservationService.impl.PurchaseConfirmationServer
+METHOD getConfirmationGroup(ShoppingCart,PurchaseConfirmationRequest, CarPurchase, CarSearchCriteria, HotelPurchase,HotelSearchCriteria, SodaEligibleItinerary, byte[], Customer, Trip, List, boolean, String)
+AT ENTRY
+IF true
+DO traceOpen("traceFile","/tmp/fault.trace");
+traceln("traceFile","Thread."+java.lang.Thread.currentThread().getId()+"."+System.currentTimeMillis()+" sleeping...");
+Thread.sleep(120000);
+traceln("traceFile","Thread."+java.lang.Thread.currentThread().getId()+"."+System.currentTimeMillis()+" awake...");
+traceClose("traceFile");
+ENDRULE
+
+RULE trace  pnr RecordLocator  constructor
+CLASS com.swacorp.common.RecordLocator
+METHOD <init>(String)
+AT EXIT
+IF true
+DO
+traceln("Thread."+java.lang.Thread.currentThread().getId()+"."+System.currentTimeMillis()+" RecordLocator("+$1+")");
+traceOpen("traceFile","/tmp/fault.trace");
+traceln("traceFile","Thread."+java.lang.Thread.currentThread().getId()+"."+System.currentTimeMillis()+" RecordLocator("+$1+") ");
+traceClose("traceFile");
+ENDRULE

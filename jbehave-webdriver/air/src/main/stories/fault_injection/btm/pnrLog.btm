@@ -1,0 +1,11 @@
+RULE trace  pnr RecordLocator  constructor
+CLASS com.swacorp.common.RecordLocator
+METHOD <init>(String)
+AT EXIT
+IF true
+DO
+traceln("Thread."+java.lang.Thread.currentThread().getId()+"."+System.currentTimeMillis()+" RecordLocator("+$1+")");
+traceOpen("traceFile","/tmp/fault.trace");
+traceln("traceFile","Thread."+java.lang.Thread.currentThread().getId()+"."+System.currentTimeMillis()+" RecordLocator("+$1+") ");
+traceClose("traceFile");
+ENDRULE

@@ -1,0 +1,3 @@
+#!/bin/sh 
+
+java -Dhttps.protocols="SSLv3,SSLv2Hello" -jar Sauce-Connect.jar --fast-fail-regexps "s32\\.newskies\\.airtran\\.com,cdns\\.brsrvr\\.com,invitemedia\\.com,adnxs\\.com,addthiscdn\\.com,intellicast\\.com,addthis\\.com,sharethis\\.com,akamai\\.net,creative\\.sbnation\\.com,d\\.southwest\\.com,s\\.southwest\\.com,atdmt\\.com,demdex\\.net,southwestairlines\\.tt\\.omtrdc\\.net,sb-ssl\\.google\\.com,fxfeeds\\.mozilla\\.com,\\.bbci\\.co\\.uk,\\.bbc\\.co\\.uk,www\\.orbitz\\.com,i-cdn\\.openx\\.com,\\.2o7\\.net,safebrowsing\\.com,metrics\\.southwest\\.com,smetrics\\.southwest\\.com" -b -d $1 $2

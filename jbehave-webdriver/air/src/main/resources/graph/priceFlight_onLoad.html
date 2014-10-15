@@ -1,0 +1,21 @@
+<html>
+<head>
+    <title>Price Flight Load Times</title>
+    <script type="text/javascript" src="js/jquery.js"></script>
+    <script type="text/javascript" src="js/highcharts.js"></script>
+    <script type="text/javascript">
+        var pageName = "Price Flight";
+        var pageMatchingUrl = /reservations\.price-reservations\.html\.json$/;
+        $(document).ready(function() {
+            var chart = makeChart(pageName);
+            forEachBuildArtifact(pageMatchingUrl, function(buildIndex, buildArtifactUrl, buildArtifact) {
+               standardAddPoint(buildIndex, buildArtifactUrl, buildArtifact, chart);
+            });
+        });
+    </script>
+    <script type="text/javascript" src="js/graph.js"></script>
+</head>
+<body>
+<div id="chart"></div>
+</body>
+</html>

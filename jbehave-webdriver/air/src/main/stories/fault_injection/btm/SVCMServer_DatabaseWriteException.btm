@@ -1,0 +1,9 @@
+RULE inject HibernateException on GiftCardReportStoreImpl
+CLASS com.swacorp.service.giftCard.dao.GiftCardReportStoreImpl
+METHOD save
+AT EXIT
+IF true
+DO
+    traceln("Byteman injecting HibernateException on call to GiftCardReportStoreImpl.save()");
+    throw new org.hibernate.HibernateException("injecting simulated HibernateException");
+ENDRULE

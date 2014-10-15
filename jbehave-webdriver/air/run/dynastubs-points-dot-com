@@ -1,0 +1,17 @@
+#!/bin/bash
+cd "../$( dirname "${BASH_SOURCE[0]}" )" && pwd
+. run/_settings
+
+mvn -e clean install \
+-Pjbehave-story-run \
+${httpProxy:+-DHTTP_PROXY=${httpProxy} }\
+${remoteWebDriverURL:+-DREMOTE_WEBDRIVER_URL=${remoteWebDriverURL} }\
+${browserVersion:+-Dbrowser.version=${browserVersion:-10} }\
+${domainToTestDotcom:+-DdomainToTest=${domainToTestDotcom} }\
+${domainToTestSwabiz:+-DswabizDomainToTest=${domainToTestSwabiz} }\
+${storyTimeoutInSecs:+-DstoryTimeoutInSecs=${storyTimeoutInSecs:-1200} }\
+${threads:+-Dthreads=${threads:-5} }\
+${EXTRA_MVN_DEFINES:+$EXTRA_MVN_DEFINES }\
+\
+-DPOINTSDOTCOM_BUY_GIFT_TRANSFER_ON -DDYNA_STUBS -DStoryTimeoutInSecs=1200 \
+-Dmeta.filter="groovy: suite == 'pointsDotCom' && !not_passing"
