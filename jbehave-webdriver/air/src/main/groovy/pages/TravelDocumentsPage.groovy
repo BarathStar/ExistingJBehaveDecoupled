@@ -188,8 +188,8 @@ class TravelDocumentsPage extends BasePage {
         String expectedFirstName = passenger.firstName.toUpperCase()
         String expectedLastName = passenger.lastName.toUpperCase()
 
-        waitForElement(By.className("passenger_first_name")).getText().shouldBe expectedFirstName
-        waitForElement(By.className("passenger_last_name")).getText().shouldBe expectedLastName
+        waitForElement(By.className("passengerFirstName")).getText().shouldBe expectedFirstName
+        waitForElement(By.className("passengerLastName")).getText().shouldBe expectedLastName
     }
 
     def verifySouthWestBoardingPass(AirReservation airReservation) {

@@ -31,7 +31,7 @@ public enum FareClass {
         }
     }
 
-    public String fareClassCode() {
+  public String fareClassCode() {
         return fareClass
     }
 

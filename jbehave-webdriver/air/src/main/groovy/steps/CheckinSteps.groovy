@@ -140,7 +140,7 @@ public class CheckinSteps {
                 verifySelectPrintDocumentPage()
                 verifyRapidRewardNumberText()
                 if(!itineraryData.isPromoCertBooking()){
-                    verifyUpgradeToBusinessSelectButtonDisplayed()
+                    //verifyUpgradeToBusinessSelectButtonDisplayed()
                 }
                 verifyAdditionalDocumentation()
                 //verifyDepartureAndArrivalCities()  //aruna
@@ -430,5 +430,20 @@ public class CheckinSteps {
     def checkinWithMBPselected(){
         performCheckinOnline()
         mobileBoardingPassSteps.verifySubmitButtonIsPresent()
+    }
+
+    @When("I click Infants 0-2 years old link")
+    def clickOnInfants02OldLink() {
+        checkinPage.clickInfantsLink()
+    }
+
+    @When("I click Portable Oxygen Concentrators link")
+    def clickOnOxygenConcentratorsLink() {
+        checkinPage.clickOxygenLink()
+    }
+
+    @When("I click Assistance Animals link")
+    def clickOnAssistanceAnimals() {
+        checkinPage.clickAssistanceAnimalsLink()
     }
 }

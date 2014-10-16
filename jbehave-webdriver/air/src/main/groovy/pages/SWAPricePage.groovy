@@ -105,14 +105,12 @@ class SWAPricePage extends BasePage
 
         acceptNewPriceAndContinue()
         if (!DynaStubsIntegration.useDynaStubs()) {
-            if (itineraryData.points) {
+            if (itineraryData.points&&flow.isCustomer) {
                 pricePage.clickContinue()
-                if (flow.isCustomer) {
-                    pricePage.verifyOopsPointsBookingNonRRUser()
-                }
+                pricePage.verifyOopsPointsBookingNonRRUser()
             }
-            // need to implement calculations-saravanan
-            else {
+           else
+            {
                 if (flow.isRapidRewards || flow.isCustomer) {
 
                     rapidRewardsAccountBar.with {
@@ -187,8 +185,9 @@ class SWAPricePage extends BasePage
                             verifyGovtTaxesFeesLinkIsPresent()
                             verifyFareType()
                         }
+                pricePage.clickContinue()
             }
-            pricePage.clickContinue()
+
         }
     }
 

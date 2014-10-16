@@ -8,6 +8,10 @@ market :
   direct  : *marketdefault
   connect : *marketdefault
 
+test :
+  outboundConnectingStation : ANY
+  inboundConnectingStation : ANY
+
 openjaw :
   departAirport : LAS
   arriveAirport : PHX

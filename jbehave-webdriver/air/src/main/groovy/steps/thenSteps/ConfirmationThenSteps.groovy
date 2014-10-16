@@ -512,8 +512,9 @@ class ConfirmationThenSteps {
         confirmationPage.verifyAddEarlyBirdCheckInButtons()
         confirmationPage.verifySubscribeToFlightMessage()
         confirmationPage.verifyDate()
-        confirmationPage.verifyDepartureAndArrivalCities()
-        confirmationPage.verifyDepartureAndArrivalTime()
+        //samurai
+        //confirmationPage.verifyDepartureAndArrivalCities()
+        //confirmationPage.verifyDepartureAndArrivalTime()
         confirmationPage.verifyFlightNumber()
         confirmationPage.verifyTravelTime(true)
         confirmationPage.verifyRoutingType()
