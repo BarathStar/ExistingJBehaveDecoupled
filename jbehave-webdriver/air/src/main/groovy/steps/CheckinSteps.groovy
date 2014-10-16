@@ -140,7 +140,7 @@ public class CheckinSteps {
                 verifySelectPrintDocumentPage()
                 verifyRapidRewardNumberText()
                 if(!itineraryData.isPromoCertBooking()){
-                    verifyUpgradeToBusinessSelectButtonDisplayed()
+                    //verifyUpgradeToBusinessSelectButtonDisplayed()
                 }
                 verifyAdditionalDocumentation()
                 //verifyDepartureAndArrivalCities()  //aruna

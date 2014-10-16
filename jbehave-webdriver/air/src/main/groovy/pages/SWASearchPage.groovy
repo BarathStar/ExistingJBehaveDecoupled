@@ -31,6 +31,7 @@ import static util.Locators.ELEMENT_IDS
 import util.ItineraryData
 import fixture.stubs.DynaStubsIntegration
 import com.swacorp.dotcom.webscenarios.air.PromoDiscountData
+
 class SWASearchPage extends BasePage
 {
 
@@ -134,35 +135,44 @@ class SWASearchPage extends BasePage
         itineraryData.returnStation = return_station
     }
 
-    def selectOutBoundTripType(String outbound_route_type) {
+    def selectOutBoundTripType(String outbound_route_type)
+    {
         def tType = outbound_route_type.replaceAll('\\s+','').replaceAll('\\-','').toLowerCase()
+
         switch(tType) {
             case "nonstop":
                 itineraryData.outboundRouting = NS
                 break
             case "planechange":
-                 itineraryData.outboundConnectingStation = yaml.market.default.outboundConnectingStation
+
+
+                //itineraryData.outboundConnectingStation = yaml.market.default.outboundConnectingStation
+                itineraryData.outboundConnectingStation = "ANY"
                 itineraryData.outboundRouting = "1 stop"
                 flow.hasConnectionFlight = true
                 break
 
         case "direct":
                 itineraryData.outboundRouting = "1 stop"
-            itineraryData.outboundConnectingStation = yaml.market.default.outboundConnectingStation
+                itineraryData.outboundConnectingStation = yaml.market.default.outboundConnectingStation
                 break
             default:
                 throw new RuntimeException("change the outboundType it should be something like Non Stop or 1 stop")
         }
     }
 
-    def selectInBoundTripType(String inbound_route_type) {
+    def selectInBoundTripType(String inbound_route_type)
+    {
         def tType = inbound_route_type.replaceAll('\\s+','').replaceAll('\\-','').toLowerCase()
+
         switch(tType) {
             case "nonstop":
                 itineraryData.inboundRouting = NS
                 break
             case "direct":
-                itineraryData.inboundConnectingStation = yaml.market.default.inboundConnectingStation
+
+                //itineraryData.inboundConnectingStation = yaml.market.default.inboundConnectingStation
+                itineraryData.inboundConnectingStation = "ANY"
                 itineraryData.inboundRouting = "1 stop"
                 break
             case "planechange":
@@ -243,7 +253,7 @@ class SWASearchPage extends BasePage
             case "passengerofsize":
             itineraryData.passengerOfSize=true
             itineraryData.adultPassengerCount = passenger_count*2
-                passengerData.addPassengerOfSize()
+            passengerData.addPassengerOfSize()
             break
             case "child":
             case "infant":

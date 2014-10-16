@@ -176,13 +176,13 @@ class SWASelectPage extends BasePage
                 itineraryData.outboundRouting = NS
                 break
             case "planechange":
-                itineraryData.outboundConnectingStation = yaml.market.default.outboundConnectingStation
+               itineraryData.outboundConnectingStation = yaml.market.default.outboundConnectingStation
                 itineraryData.outboundRouting = "1 stop"
                 flow.hasConnectionFlight = true
                 break
             case "direct":
                 itineraryData.outboundRouting = "1 stop"
-                itineraryData.outboundConnectingStation = yaml.market.default.outboundConnectingStation
+               itineraryData.outboundConnectingStation = yaml.market.default.outboundConnectingStation
                 break
             default:
                 throw new RuntimeException("change the outboundType it should be something like Non Stop or 1 stop")

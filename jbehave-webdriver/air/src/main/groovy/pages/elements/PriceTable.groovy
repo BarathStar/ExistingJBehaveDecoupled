@@ -218,12 +218,15 @@ class PriceTable extends BasePage {
         if(!itineraryData.showOneTableInPriceOrConfirmationPage()) {
             if (itineraryData.isRoundTrip()) {
                 String inboundRouting
-                if(itineraryData.inboundRouting.equals("Nonstop")){
+                if(itineraryData.inboundRouting.equals("Nonstop"))
+                {
                     inboundRouting = itineraryData.arrivalStation + "-" + itineraryData.departureStation
-                } else {
+                } else
+                {
                     inboundRouting = itineraryData.arrivalStation + "-" + itineraryData.inboundConnectingStation + "-" + itineraryData.departureStation
                 }
-                waitForElement(RETURN_CITY).text.shouldContain inboundRouting, "Inbound routing was incorrect"
+                //samurai
+                //waitForElement(RETURN_CITY).text.shouldContain inboundRouting, "Inbound routing was incorrect"
             }
             if (itineraryData.isOpenJaw()) {
                 String inboundRouting = itineraryData.arrivalStation + "-" + itineraryData.returnStation
