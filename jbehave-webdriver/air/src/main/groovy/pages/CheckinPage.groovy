@@ -68,8 +68,13 @@ class CheckinPage extends BasePage {
     private static final By CONTINUE_TO_GET_SECURITY_DOCUMENT = By.id("modalContinue");
     private static final By QUICK_AIR_CHECKIN = By.id("quick_air_checkin");
     private static final By SPECIAL_FLIGHT_POLICIES_LINKS = By.cssSelector(".special_flight_policies p a")
+    //private static final By INFANTS_0-2_LINK = By.cssSelector("[href*='/html/customer-service/family/baby-on-board-pol.html']")
+    private static final By INFANTS_02_LINK = By.linkText("Infants 0-2 years old")
+    private static final By PORTABLE_OXYGEN_CONCENTRATORS_LINK = By.linkText("Portable Oxygen Concentrators")
+    private static final By ASSISTANCE_ANIMALS_LINK = By.linkText("Assistance Animals")
 
     ScenarioState scenarioState
+
     Flow flow
     StopLogicInfo stopLogicInfo
     ItineraryData itineraryData
@@ -405,6 +410,18 @@ class CheckinPage extends BasePage {
         infantLink.shouldBe "Infants 0-2 years old","'Infants 0-2 years old' was not present in checkin page"
         portableOxygenLink.shouldBe "Portable Oxygen Concentrators","'Portable Oxygen Concentrators' was not present in checkin page"
         animalAssistance.shouldBe "Assistance Animals","'Assistance Animals' was not present in checkin page"
+    }
+
+    def clickInfantsLink() {
+        waitForElement(INFANTS_02_LINK).click
+    }
+
+    def clickOxygenLink() {
+        waitForElement(PORTABLE_OXYGEN_CONCENTRATORS_LINK).click
+    }
+
+    def clickAssistanceAnimalsLink() {
+        waitForElement(ASSISTANCE_ANIMALS_LINK).click
     }
 }
 

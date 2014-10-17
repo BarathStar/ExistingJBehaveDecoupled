@@ -221,8 +221,15 @@ class SWASearchPage extends BasePage
         }
     }
 
+    /**
+     * Handles adding passengers into the flow for purchase page. If this is a loggedIn flow, the logged in user will be added as one of the passenger.
+     * The logged In details will be pulled from the Flow class.
+     * @param passenger_count
+     * @param passenger_type
+     */
     def selectPassengers(int passenger_count,String passenger_type) {
         def pType = passenger_type.replaceAll('\\s+','').toLowerCase()
+        //TODO do we need a null check here? Set the count variables as int by default
         if(itineraryData.adultPassengerCount == null)
         itineraryData.adultPassengerCount = 0
         if(itineraryData.seniorPassengerCount == null)
@@ -244,6 +251,7 @@ class SWASearchPage extends BasePage
                 itineraryData.seniorPassengerCount = itineraryData.seniorPassengerCount+passenger_count
                 passengerData.addSeniorPassengers(passenger_count)
                 break
+            //TODO validate if inihibited checking is to be done here.  inihibited is not a passenger type
             case "inhibited":
                 itineraryData.inhibitedPassenger=true
                 itineraryData.adultPassengerCount = passenger_count
@@ -282,7 +290,7 @@ class SWASearchPage extends BasePage
     def setFlightEligibleForCheckin(){
         itineraryData.isValidForCheckin = true;
     }
-
+    //TODO Search a flight shouldn't handle the passenger details. To validate
     def searchFlight() {
         //homepage.fillInFlightSearchAndClick(itineraryData, true)
         homepage.fillInFlightSearchInfoAndClick(itineraryData, true)
