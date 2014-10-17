@@ -297,6 +297,12 @@ class SWASelectPage extends BasePage
         itineraryData.isValidForCheckin = true;
     }
 
+    /**
+     * Select a flight based on direction (outbound or inbound), routing(Nonstop, 1 plane change etc) and fare type (BS, AT, WGA, Senior etc)
+     * Verifies if the maximum allowed passenger is 8
+     * Verifies all the common assertions.
+     * Proceed to next page if there is no oops message displayed
+     */
     def selectFlight()
     {
 
@@ -307,6 +313,7 @@ class SWASelectPage extends BasePage
             flightSearchForm.fillInSenior(itineraryData.seniorPassengerCount)
        // flightSearchForm.addSeniorPassengers(itineraryData.seniorPassengerCount)
 
+        //TODO To validate if this step is required in select flights method.
         if(itineraryData.adultPassengerCount >0)
             flightSearchForm.fillInAdult(itineraryData.adultPassengerCount)
         // flightSearchForm.addAdultPassengers(itineraryData.seniorPassengerCount)

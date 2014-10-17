@@ -33,6 +33,11 @@ class SWALoginPage extends BasePage {
         checkNoOops()
     }
 
+    /**
+     * Handles user log in process based on different member types. The framework uses a SiebelQA data class which holds all user account details.
+     * Example: SiebelQA336LoyaltyData
+     * @param member_type  anonymous/Customer/RR member
+     */
     def login(String member_type) {
         def memberType = member_type.replaceAll('\\s+', '').replaceAll('\\-', '').toLowerCase()
         switch (memberType) {

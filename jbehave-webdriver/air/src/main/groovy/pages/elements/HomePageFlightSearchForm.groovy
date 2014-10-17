@@ -97,6 +97,14 @@ public class HomePageFlightSearchForm extends FlightSearchForm implements Groovy
         (verifyNoOpps) ? submit(SUBMIT_BUTTON_ID_NAME) : waitForElement(By.id(SUBMIT_BUTTON_ID_NAME)).click()
     }
 
+    /**
+     * Fills in all the required inputs to search a flight from the Home page and proceed to the select flight page.
+     * Also handles inputting the promode if given.
+     * @param itineraryData - Data holder for all itinerary details.
+     * @param createData
+     * @param buttonId
+     * TODO To validate if filling passengers inside the fillinFlightSearch method required. Passengers are already getting added in a previous steps in the flow
+     */
     def fillInFlightSearchInfoAndClick(ItineraryData itineraryData, boolean createData, String buttonId = SUBMIT_BUTTON_ID_NAME) {
         selectItineraryType(itineraryData)
         fillInAirports(itineraryData.departureStation, itineraryData.arrivalStation, itineraryData.returnStation)

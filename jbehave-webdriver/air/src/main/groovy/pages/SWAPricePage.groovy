@@ -100,6 +100,10 @@ class SWAPricePage extends BasePage
 
     }
 
+    /**
+     * Verifies all common assertions in the Price page and proceed to purchase page if there are no Oops messages.
+     *
+     */
     def verifyPriceDetails()
     {
 
