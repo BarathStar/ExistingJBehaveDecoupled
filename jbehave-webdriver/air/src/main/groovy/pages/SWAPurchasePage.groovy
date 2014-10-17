@@ -18,6 +18,7 @@ import pages.elements.CreditCardSubForm
 import pages.elements.FeeCalculator
 import pages.elements.FlightSearchForm
 import pages.elements.PurchaseSubForm
+import pages.SWADisabilitiesPage
 import pages.elements.ShoppingCart
 import state.Flow
 import state.PassengerData
@@ -71,10 +72,8 @@ class SWAPurchasePage extends BasePage
 
 
 
-    public SWAPurchasePage(WebDriverProvider driverProvider)
-    {
+    public SWAPurchasePage(WebDriverProvider driverProvider) {
         super(driverProvider,"");
-
     }
 
     def purchaseTicket()
@@ -184,7 +183,8 @@ class SWAPurchasePage extends BasePage
               disabilitiesPage.with
                       {
                           addAssistanceWithWheelchair()
-                          checkBlindOrHaveLowVision()
+                          //TODO: below line was commented by Offshore
+						  //checkBlindOrHaveLowVision()
                           verifyBasicPage()
                           verifyPageHeader()
                           verifyContinueButton()
@@ -249,6 +249,13 @@ class SWAPurchasePage extends BasePage
         }
        }
 
+	def addSSROptions(String paxIdx, String options)
+    {
+        waitForElement(By.id("disability_button"+paxIdx)).click()
+        swaDisabilitiesPage.addSSROptions(options)
+        swaDisabilitiesPage.submit()
+    }
+
     def addCWCPOCOptions(String paxIdx)
     {
         waitForElement(By.id("disability_button"+paxIdx)).click()
@@ -258,4 +265,25 @@ class SWAPurchasePage extends BasePage
 
     }
 
+    def addDisabilityPassengerCount(String paxIdx)
+    {
+        waitForElement(By.id("disability_button"+paxIdx)).click()
+    }
+
+    def addDisabledOptions(String opt,String b_count)
+    {
+        swaDisabilitiesPage.clickDisabilitiesAndAssistanceOptions(opt,b_count)
+
+    }
+
+    def addDisabledOptions(String opt)
+    {
+        swaDisabilitiesPage.clickDisabilitiesAndAssistanceOptions(opt)
+
+    }
+
+    def submitDisabledOptions()
+    {
+        swaDisabilitiesPage.submit()
+    }
 }

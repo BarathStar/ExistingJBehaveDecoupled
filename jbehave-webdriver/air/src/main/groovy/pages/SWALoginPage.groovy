@@ -3,14 +3,13 @@ package pages
 
 import pages.elements.GlobalNavigationHeader
 import state.RRUserQueue
-import steps.conditional.ToggleHomepage2
+import steps.conditional.ToggleHomepage2 //TODO: Possibly remove
 import org.jbehave.web.selenium.WebDriverProvider
 import com.swacorp.dotcom.webscenarios.air.Data
 import com.swacorp.dotcom.webscenarios.air.RRUser
 import fixture.stubs.DynaStubsIntegration
 import org.openqa.selenium.By
 import state.Flow
-
 
 
 class SWALoginPage extends BasePage {
@@ -45,31 +44,89 @@ class SWALoginPage extends BasePage {
                 break
 
             case "rrmember":
-                accountSteps.loginAsRRmember()
+                loginAsRRmember()
                 break
             case "preferredname":
-                accountSteps.logInAsAMemberWithAPreferredName()
+                logInAsAMemberWithAPreferredName()
                 break
 
             case "alist":
             case "alistmember":
-                accountSteps.logInAsAListMember()
+                logInAsAListMember()
                 break
 
             case "rrcreditcard":
-                accountSteps.logRRwithCC()
+                logRRwithCC()
                 break
             case "rrseniorcreditcard":
-                accountSteps.logRRSeniorWithCC()
+                logRRSeniorWithCC()
                 break
             case "rrminorpoints":
-                accountSteps.logRRMinorPoints()
+                logRRMinorPoints()
+                break
+            case "ageverifiedsenior":
+                loginIntoAccount(memberType)
+                break
+            case "ageverifiedcustomer":
+                loginIntoAccount(memberType)
                 break
             default:
                 throw new RuntimeException("Invalid Login, Enter valid Member Type")
         }
     }
+    def logRRwithCC() {
+        def user = createRRUser("RRCreditCard")
+        if (useNewHomePageToLogin()) {
+            logIntoRRAccount(user)
+        } else {
+            accountBar.logInToRapidRewards(user.getRRNumber(), user.getRRPassword())
+        }
+    }
+    def logRRMinorPoints(){
+        def user = createRRUser("RRMinorPoints")
+        if (useNewHomePageToLogin()) {
+            logIntoRRAccount(user)
+        } else {
+            accountBar.logInToRapidRewards(user.getRRNumber(), user.getRRPassword())
+        }
+    }
+    def logRRSeniorWithCC() {
+        def user = createRRUser("RRSeniorCreditCard")
+        if (useNewHomePageToLogin()) {
+            logIntoRRAccount(user)
+        } else {
+            accountBar.logInToRapidRewards(user.getRRNumber(), user.getRRPassword())
+        }
+    }
+    def logInAsAListMember() {
+        def user = createRRUser("Alist")
+        if (useNewHomePageToLogin()) {
+            logIntoRRAccount(user)
+            globalNavigationHeader.verifyTierStatusFlagInHotState("A-List")
+        } else {
+            accountBar.logInToRapidRewards(user.getRRNumber(), user.getRRPassword())
+            accountBar.verifyTierIsDisplayed("A-List");
+        }
+    }
 
+    def loginAsRRmember() {
+        if (flow.rrUser == null){
+            flow.setUser(createRRUser())
+        }
+        if (useNewHomePageToLogin()) {
+            logIntoRRAccount(flow.getUser())
+        } else {
+            accountBar.logInToRapidRewards(flow.getUser().getRRNumber(),flow.getUser().getRRPassword())
+        }
+    }
+    def logInAsAMemberWithAPreferredName() {
+        def user = createRRUser("preferredName")
+        if (useNewHomePageToLogin()) {
+            logIntoRRAccount(user)
+        } else {
+            accountBar.logInToRapidRewards(user.getRRNumber(), user.getRRPassword())
+        }
+    }
 
     def loginAsCustomerUser() {
         def user = createRRUser("customer")
@@ -101,7 +158,7 @@ class SWALoginPage extends BasePage {
         flow.isCustomer = true
     }
 
-    def logInAsCustomer (String username, String password){
+    def logInAsCustomer (String username, String password) {
         logInAsAUser(username, password)
         flow.isCustomer = true
         flow.isLoggedIn = true
@@ -116,4 +173,27 @@ class SWALoginPage extends BasePage {
         flow.isLoggedIn = true
     }
 
- }
+    private void loginIntoAccount(String userType) {
+        RRUser user= null
+        if (userType.contains("senior")) {
+            user = createRRUser("RRCreditCard")
+            user.setAccountNumber("600594945")
+            user.setPassword("test123")
+            user.setFirstName("Richard")
+            logIntoRRAccount(user)
+        } else if (userType.contains("customer")) {
+            user = createRRUser("customer")
+            user.setAccountName("600594945")
+            user.setPassword("test123")
+            user.setFirstName("Richard")
+            logIntoCustomerAccount(user)
+        }
+
+    }
+
+    private void logIntoRRAccount(RRUser user) {
+        logIntoAccount(user)
+        flow.isRapidRewards = true
+        flow.userLoggedInRapidRewardsNumber = flow.getUser().getUserName()
+    }
+}

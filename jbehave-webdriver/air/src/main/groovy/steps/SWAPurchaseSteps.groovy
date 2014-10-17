@@ -112,12 +112,34 @@ class SWAPurchaseSteps
          purchasePages.purchaseTicket()
      }
 
-    @When("I choose the disabilities option for \$Pax_Id passenger")
-    def addDisabilities(int pax_id)
+    @When("I choose the disabilities option for \$PaxId passenger")
+    def addDisabilitiesPassengerCount(int pax_id)
     {
         pax_id = pax_id - 1;
         String pax_id_value = String.valueOf(pax_id)
-        purchasePages.addCWCPOCOptions(pax_id_value)
+        purchasePages.addDisabilityPassengerCount(pax_id_value)
+    }
+
+    @When("I select the \$DisOption with battery count \$BatteryCount")
+    def addAllDisabilitiesOptions(String dis_option,String battery_count)
+    {
+        purchasePages.addDisabledOptions(dis_option,battery_count)
+
+    }
+
+    @When("I select the disabilities option as \$DisOption")
+    def addAllDisabilitiesOptions(String dis_option)
+    {
+        purchasePages.addDisabledOptions(dis_option)
+
+
+    }
+
+    @When("I submit the disabilities options")
+    def submitOptions()
+    {
+        purchasePages.submitDisabledOptions()
+
     }
 
 

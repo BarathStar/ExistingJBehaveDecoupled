@@ -77,6 +77,90 @@ class SWADisabilitiesPage extends BasePage {
     {
         waitForElement(By.id("manualWheelchair")).click()
     }
+    
+	//r code
+
+    def clickDisabilitiesAndAssistanceOptions(String option,String b_count)
+    {
+
+
+             switch(option)
+             {
+
+                 case  "Powered wheelchair with spillable batteries":
+                     waitForElement(By.id("spillableBatteries")).click()
+                     Select selectBox = new Select(waitForElement(By.id("spillableBatteryCount")))
+                     selectBox.selectByValue(b_count)
+                     break
+
+                 case  "Powered wheelchair with non-spillable batteries":
+                     waitForElement(By.id("nonSpillableBatteries")).click()
+                     Select selectBox = new Select(waitForElement(By.id("nonSpillableBatteryCount")))
+                     selectBox.selectByValue(b_count)
+                     break
+
+
+             }
+
+
+    }
+
+
+    def clickDisabilitiesAndAssistanceOptions(String option)
+    {
+
+
+        switch(option)
+        {
+            case  "No wheelchair assistance needed":
+                waitForElement(By.id("nowheelchairAssistanceType")).click()
+                break
+            case  "Can walk but need assistance to and from gate":
+                waitForElement(By.id("canWalkButNeedAssistance")).click()
+                break
+            case  "Need lift/transfer assistance to and from aircraft seat":
+                waitForElement(By.id("cannotWalk")).click()
+                break
+            case  "Can walk but need assistance to and from gate":
+                waitForElement(By.id("canWalkButNeedAssistance")).click()
+                break
+
+            case  "No wheelchair stowage needed":
+                waitForElement(By.id("noWheelchairStorageType")).click()
+                break
+
+            case  "Manual wheelchair":
+                waitForElement(By.id("manualWheelchair")).click()
+                break
+
+            case  "Blind or have low vision":
+                waitForElement(By.id("vision")).click()
+                break
+            case  "Deaf or hard of hearing":
+                waitForElement(By.id("hearing")).click()
+                break
+            case  "Cognitive and developmental disabilities":
+                waitForElement(By.id("cognitive")).click()
+                break
+            case  "Traveling with trained assistance animal":
+                waitForElement(By.id("assistanceAnimal")).click()
+                break
+            case  "Traveling with emotional support animal":
+                waitForElement(By.id("comfortCreature")).click()
+                break
+            case  "Have peanut dust allergy":
+                waitForElement(By.id("peanutAllergy")).click()
+                break
+            case  "Bringing my own approved Portable Oxygen Concentrator":
+                waitForElement(By.id("oxygenConcentrator")).click()
+                break
+
+        }
+
+
+    }
+
+
 
     private def checkOneSSROption(String option) {
         waitForElement(By.id(option)).click()
