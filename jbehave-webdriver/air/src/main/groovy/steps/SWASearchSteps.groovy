@@ -119,6 +119,7 @@ class SWASearchSteps {
     }
 
 
+
     @Given("I search the flight")
     def selectRoundTripCitiesWithFare() {
         searchPage.searchFlight()

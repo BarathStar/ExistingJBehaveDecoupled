@@ -14,6 +14,9 @@ import pages.elements.AutoCompleteWidget
 import pages.elements.StaticBookingWidget
 import org.openqa.selenium.By
 
+/**
+ * Contains the steps for navigating through any stories that deal with the Customized Booking Widget
+ */
 class StaticBookingWidgetSteps {
 
     AirTranRedirectModal airTranRedirectModal
@@ -58,6 +61,15 @@ class StaticBookingWidgetSteps {
         String currentPageTitle = staticBookingWidget.getTitle()
         staticBookingWidget.clickOnSearchButton()
         staticBookingWidget.waitForPageTitleToChangeOrOops(currentPageTitle)
+    }
+
+    /**
+     * Handles clicking the search button as specified in the story
+     * @return
+     */
+    @When("I click on search.")
+    def clickOnSearch() {
+        staticBookingWidget.clickOnSearchButton()
     }
 
     private completeWidgetWithValidOutboundDates() {
@@ -127,6 +139,15 @@ class StaticBookingWidgetSteps {
         staticBookingWidget.verifyOneWayRadioButtonIsChecked()
     }
 
+    /**
+     * Sets the trip type to round trip by clicking the Round Trip radio button
+     * @return
+     */
+    @When("The trip type is round trip")
+    private checkRoundTrip() {
+        staticBookingWidget.clickRoundTrip()
+    }
+
 
     private returnDateDisabled() {
         staticBookingWidget.verifyReturnDateIsDisabled()
@@ -137,18 +158,29 @@ class StaticBookingWidgetSteps {
     }
 
     @Then("I enter valid dates and click on the search button")
+    @When("I select the travel date")
     def thenEnterValidDates(){
         completeWidgetWithValidOutboundDates()
         completeWidgetWithValidReturnDates()
         staticBookingWidget.clickOnSearchButtonAndValidatePage()
     }
 
-    @When("I select \$input in the custom departure dropdown")
+    /**
+     * Sets the departure city to a defined departure city as found in the story
+     * @param inputData the departure city defined in the story file
+     * @return
+     */
+    @When("The departure city is \$input")
     def enterDepartureCityInField(@Named("input") String inputData) {
         staticBookingWidget.chooseInDropDownByValue(DEPARTURE_DROPDOWN, inputData)
     }
 
-    @When("I select \$input in the default departure dropdown")
+    /**
+     * Sets the arrival city to a defined arrival city as found in the story
+     * @param inputData the arrival city defined in the story file
+     * @return
+     */
+    @When("The arrival city is \$input")
     def enterArrivalCityInDropdown(@Named("input") String inputData) {
         staticBookingWidget.chooseInDropDownByValue(ARRIVAL_DROPDOWN, inputData)
     }
@@ -204,6 +236,26 @@ class StaticBookingWidgetSteps {
         boolean dateEmpty
         dateEmpty = staticBookingWidget.waitForElement(OUTBOUND_DATE).getAttribute("value").isEmpty()
         dateEmpty = staticBookingWidget.waitForElement(RETURN_DATE).getAttribute("value").isEmpty()
+    }
+
+    /**
+     * Sets the number of adults on the flight
+     * @param adult the number of adults specified in the story
+     */
+    @When("The adult is \$adult")
+    void setAdults(String adult)
+    {
+        staticBookingWidget.setAdultPassengerCount(adult)
+    }
+
+    /**
+     * Sets the number of seniors on the flight
+     * @param senior the number of seniors specified in the story
+     */
+    @When("The seniors is \$senior")
+    void setSenior(String senior)
+    {
+        staticBookingWidget.setSeniorPassengerCount(senior)
     }
 
 

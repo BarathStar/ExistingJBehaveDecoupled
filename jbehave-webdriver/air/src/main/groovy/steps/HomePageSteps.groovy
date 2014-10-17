@@ -22,6 +22,7 @@ import pages.elements.GlobalNavigationFooter
 import pages.elements.GlobalNavigationHeader
 import pages.elements.RapidRewardsAccountBar
 import pages.elements.TravelToolsDropDownMenu
+import pages.elements.StaticBookingWidget
 import state.Flow
 import steps.conditional.ToggleGlobalNav
 import steps.conditional.ToggleHomepage2
@@ -48,6 +49,7 @@ class HomePageSteps {
     Data data
     PurchasePage purchasePage
     RapidRewardsAccountBar rapidRewardsAccountBar
+    StaticBookingWidget staticBookingWidget
 
     @Given("I am on the Gift Card Landing page")
     def openGiftCardLandingPage(){
@@ -435,6 +437,11 @@ class HomePageSteps {
     void loggedInAsRapidRewardsMemberWithUserNameAndPassword() {
         RRUser rrUser = flow.getRrUser()
         globalNavigationHeader.logInAsRapidRewardsMember(rrUser)
+    }
+
+    @When("I search a flight with given url \$url")
+    void navigateToBookingWidget(String url) {
+        staticBookingWidget.openBookingWidgets(url)
     }
 
     private void verifyLoggedInInformation() {
