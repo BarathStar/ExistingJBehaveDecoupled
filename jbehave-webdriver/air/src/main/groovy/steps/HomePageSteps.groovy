@@ -380,7 +380,6 @@ class HomePageSteps {
     }
 
     @When("I click on check-in in global navigation")
-    @Alias ("I go to the Checkin online page through the Air menu")
     def clickOnCheckInGlobalNav() {
         if (ToggleGlobalNav.isOn()) {
             globalNavigationHeader.openNewHeaderMenuPlanATripPartOne()

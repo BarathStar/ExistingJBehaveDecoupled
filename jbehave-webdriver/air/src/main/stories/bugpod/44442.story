@@ -17,7 +17,8 @@ Air_Booking_Points_OW_BS_NT_Checkin_Eligible
 new steps to be created
 --------------------------------------
 
-When I go to the Checkin online page through the Air menu
+!--When I go to the Checkin online page through the Air menu
+When I click on check-in in global navigation
 And I attempt to view the checkin details for my flight
 Then I click checkin to create a boarding pass
 When I click Infants 0-2 years old link
