@@ -12,6 +12,9 @@ import org.jbehave.core.annotations.*
 import pages.*
 import util.ItineraryDateFactory
 
+/**
+ * Contains web objects and methods related to performing a search for a flight
+ */
 class SWASearchSteps {
 
     private final static HOME_PAGE_SUBMIT_BUTTON = "booking_widget_content_row_btn_search"
