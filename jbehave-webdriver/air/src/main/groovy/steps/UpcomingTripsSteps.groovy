@@ -1,6 +1,7 @@
 package steps
 
 import org.jbehave.core.annotations.When
+import pages.CheckinPage
 import pages.TripDetailsPage
 import pages.UpcomingTripsPage
 import state.ScenarioState
@@ -10,6 +11,7 @@ class UpcomingTripsSteps {
     UpcomingTripsPage upcomingTripsPage
     TripDetailsPage tripDetailsPage
     ScenarioState scenarioState
+    CheckinPage checkinPage
 
     @When("I select an Air reservation which is not part of a trip from Upcoming Trips page")
     def clickOnViewAirDetailsLink() {
@@ -30,5 +32,10 @@ class UpcomingTripsSteps {
     @When ("I click on my last reservation link to see the flight details")
     def clickViewTripDetailsForPNR(){
         upcomingTripsPage.clickViewDetailFlightForPNRWithCities(scenarioState.getLastAirReservation().getItineraryData().arrivalStation.toString(), scenarioState.getLastAirReservation().getItineraryData().departureStation.toString())
+    }
+
+    @When("I click on the check in link from the quick air links")
+    def clickCheckinBtn() {
+        checkinPage.openCheckinPageInAnotherWindow()
     }
 }
