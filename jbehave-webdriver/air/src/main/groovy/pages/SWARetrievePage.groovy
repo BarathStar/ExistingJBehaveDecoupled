@@ -72,6 +72,7 @@ class SWARetrievePage extends BasePage
             lastName = passenger.lastName
         }
         searchFlightsPage.open()
+        //TODO open() method internally calls verifyPage() method. Do we need to call verifyPage() again here?
         searchFlightsPage.verifyPage()
         searchFlightsPage.clickManageReservationLink()
         viewReservationPage.retrieveItineraryByPnr(airReservation.adultPnr, firstName, lastName)

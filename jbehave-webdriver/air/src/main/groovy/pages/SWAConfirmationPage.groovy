@@ -394,7 +394,10 @@ class SWAConfirmationPage extends BasePage {
     }
 
     def verifyCheckinButtonIsAvailable() {
-        verifyElementPresent("Check-in Button", By.id("checkInForFlightButton"))
+        //verifyElementPresent("Check-in Button", By.id("checkInForFlightButton"))
+        //Ravendra - Strory# -date:10/18/14 - //
+        // changed elementname to Check-in
+        verifyElementPresent("Check-in", By.id("checkInForFlightButton"))
     }
 
     def verifyCheckinButtonIsUnavailable() {
@@ -695,6 +698,8 @@ class SWAConfirmationPage extends BasePage {
     }
 
     void clickOnCheckInForFlightButton() {
+        //Ravendra - Strory# -date:10/18/14 - //
+        verifyCheckinButtonIsAvailable()
         waitForElement(CHECKIN_FOR_FLIGHT_BUTTON).click()
     }
 
@@ -1122,24 +1127,25 @@ class SWAConfirmationPage extends BasePage {
         switchToOpenWindow(getWindowHandle(), "Flight Status Notification Page")
     }
 
-
+    //Ravendra - Strory# -date:10/19/14 - //
+    //Ravendra: refactor method below to make sure method has only required verifications not ALL.
     void verifySWACompleteItinerary()
     {
-        verifyBasicPage()
+        verifyBasicPage()  //ok
         verifyStationsOnHeader()
-        verifyNewAirConfirmationPresent()
-        verifyStationsInAirWidget()
-        verifyAirTotalInAirWidgetWithTotalFromPricePage()
-        verifyAirViewDetailsLinkHref()
-        verifyAirTotalWidgetEqualsTripTotal()
-        verifyHotelWidget()
-        verifyCarWidget()
-        verifyViewBillingDetailsLinkIsPresent()
-        verifyTripName(itineraryData.getDefaultTripName())
-        verifyChangeAndCancelLinksPresent()
-        verifyStationsInDetails()
-        verifyConfirmationNumbers()
-        verifyPassengerName()
+        //verifyNewAirConfirmationPresent()   //ok - This is available under "ConfirmationVerfication.groovy" file. move to ConfirmationPage??
+        verifyStationsInAirWidget()   //ok
+        verifyAirTotalInAirWidgetWithTotalFromPricePage() //ok --not clear.
+        verifyAirViewDetailsLinkHref() //ok
+        verifyAirTotalWidgetEqualsTripTotal()    //ok
+        verifyHotelWidget() //ok - can be specific to a story
+        verifyCarWidget()   //ok - can be specific to a story
+        verifyViewBillingDetailsLinkIsPresent()  //ok
+        verifyTripName(itineraryData.getDefaultTripName())   //ok
+        verifyChangeAndCancelLinksPresent()  //ok - need to revisit this method to verify the presence resend and share link.
+        verifyStationsInDetails() //ok - But,  "verifyStationsInAirWidget" method is performing same verification on page at different place.
+        verifyConfirmationNumbers()   //ok
+        verifyPassengerName() //Do we need this here? if yes, method should call "viewReservationPage.itineraryDisplayed(<<fname>>,<<lname>>)
         verifyRRLinkPresent()
         verifyAddEarlyBirdCheckInButtons()
         verifySubscribeToFlightMessage()

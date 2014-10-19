@@ -94,7 +94,7 @@ class ConfirmationPage extends BasePage {
     private static final By CANCEL_RESERVATION_LINK = By.id("cancelReservationLink")
     private static final By CHANGE_RESERVATION_LINK = By.id("changeReservationLink")
     private final static By CONFIRMATION_TRIP_NAME = By.id("confirmation_trip_name")
-    private static final By VIEW_BILLING_DETAILS_LINK = By.cssSelector(".confirmation_summary_paid_title a")
+       private static final By VIEW_BILLING_DETAILS_LINK = By.cssSelector(".confirmation_summary_paid_title a")
     private static final By CONFIRMATION_TOP_SUMMARY_FOR_CAR = By.id("confirmation_top_summary_car")
     private static final By HOTEL_CROSS_SELL = By.id("confirmation_search_alternate_hotel")
     private static final By CAR_CROSS_SELL = By.id("confirmation_search_alternate_car")
@@ -823,6 +823,7 @@ class ConfirmationPage extends BasePage {
         verifyStations(FLIGHT_ITINERARY)
     }
 
+    //Compares avaialble confirmation number on Airwidget with  confirmation in itinerarie data section.
     def verifyConfirmationNumbers() {
         if(passengerData.containsSeniorAndAdultPassengers()) {
             List<WebElement> airWidgetConfirmationNumbers = waitForElements(By.cssSelector("#confirmation_top_summary_air .confirmation_number"))

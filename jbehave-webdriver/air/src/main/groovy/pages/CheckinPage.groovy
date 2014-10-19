@@ -254,6 +254,18 @@ class CheckinPage extends BasePage {
         }
     }
 
+    //Ravendra - Strory# -date:10/18/14 - //
+    def verifyCheckinButtonEnabledDisabled(){
+        WebElement checkinButton = waitForElement(CHECKIN_BUTTON)
+        if(checkinButton.isEnabled()) {
+            print "check-in button enabled."
+            return true
+        } else {
+            return false
+            print "Checkin Button should be disabled"
+        }
+    }
+
     def verifyAirtranSeatSelectionButtonVisible() {
         isElementDisplayed(AIRTRAN_SEAT_SELECTION_BUTTON).shouldBe true, "No AirTran Seat Selection Button found"
     }

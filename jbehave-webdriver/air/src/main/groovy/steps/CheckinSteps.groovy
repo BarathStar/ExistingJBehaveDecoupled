@@ -21,7 +21,9 @@ import util.RRContactInformation
 public class CheckinSteps {
 
     TravelDocumentsPage travelDocumentsPage
-    ConfirmationPage confirmationPage
+    //Ravendra - Strory# -date:10/18/14 - //
+    //changed ConfirmationPage to SWAConfirmationPage.
+    SWAConfirmationPage confirmationPage
     ScenarioState scenarioState
     CheckinPage checkinPage
     NonRevLandingPage nonRevLandingPage
@@ -120,6 +122,16 @@ public class CheckinSteps {
         checkinPage.uncheckPrintDrinkCoupons()
     }
 
+    //Ravendra - Strory# -date:10/18/14 - //
+    @Given("I click on the Continue button if I am in the Check in and Print BP options page")
+    @When("I click on the Continue button if I am in the Check in and Print BP options page")
+    void verifyContinueButtonIsPresent() {
+        if(checkinPage.verifyCheckinButtonEnabledDisabled()) {
+            checkinPage.clickCheckinButton()
+        }
+    }
+
+    //
     @Given("I click checkin to create a boarding pass")
     @When("I click checkin to create a boarding pass")
     @Aliases(values = ["I click check in to view my boarding pass",
@@ -217,7 +229,10 @@ public class CheckinSteps {
 
     @When("I click the Checkin button on the confirmation page")
     void clickCheckInButtonOnConfirmationPage(){
-        confirmationPage.flightCheckIn()
+        //confirmationPage.flightCheckIn()
+        //Ravendra - Strory# -date:10/18/14 - //
+        confirmationPage.clickOnCheckInForFlightButton()
+
     }
 
     @When("I enter my Rapid Rewards number on the Check In page")
