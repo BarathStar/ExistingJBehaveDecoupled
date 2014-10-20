@@ -126,4 +126,24 @@ public class MBPDeliveryOptionsPage extends BasePage {
         }
     }
 
+    //Ravendra - Strory# -date:10/20/14 - //
+    //Adding new method here as it related to Boarding pass//
+    //This will be moved to new page if we decide to have one here//
+
+    //private static final By PRINT_OPTION= By.cssSelector("#boarding_container input[name=optionPrint]")
+    private static final By PRINT_OPTION= By.id("optionPrint1")
+    private static final By CONTINUE_BUTTON = By.id("checkin_button")
+
+    def clickContinueButton() {
+        WebElement checkbox = waitForElement(PRINT_OPTION)
+        if (checkbox.isSelected() && verifyContinueButtonIsPresent()) {
+            waitForElement(CONTINUE_BUTTON).click()
+            //WaitForPageToLoad
+        }
+    }
+
+    boolean verifyContinueButtonIsPresent() {
+        return isElementPresent(CONTINUE_BUTTON, 25)
+    }
+
 }

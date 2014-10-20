@@ -79,4 +79,14 @@ class MobileBoardingPassSteps {
     void submitDeliveryOptionsForm() {
         mbpDeliveryOptionsPage.submit()
     }
+
+    //Ravendra - Strory# -date:10/20/14 - //
+    //Adding new method here as it related to Boarding pass//
+    //This will be moved to new page if we decide to have one here//
+   @When("I click on the Continue button on the Boarding Pass Options page")
+   void clickContinueToViewPrintCopy() {
+       mbpDeliveryOptionsPage.clickContinueButton()
+   }
+
+
 }
