@@ -182,7 +182,6 @@ class SWAConfirmationPage extends BasePage {
     RRContactInformation rrContactInformation
     PriceTable priceTable
     FeeCalculator feeCalculator
-    SWAConfirmationPage swaConfirmationPage
     RapidRewardsAccountBar rapidRewardsAccountBar
 
     void outOfMemoryOops() {
