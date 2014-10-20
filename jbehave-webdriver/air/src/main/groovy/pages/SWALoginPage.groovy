@@ -3,7 +3,6 @@ package pages
 
 import pages.elements.GlobalNavigationHeader
 import state.RRUserQueue
-import steps.conditional.ToggleHomepage2 //TODO: Possibly remove
 import org.jbehave.web.selenium.WebDriverProvider
 import com.swacorp.dotcom.webscenarios.air.Data
 import com.swacorp.dotcom.webscenarios.air.RRUser
@@ -32,11 +31,6 @@ class SWALoginPage extends BasePage {
         checkNoOops()
     }
 
-    /**
-     * Handles user log in process based on different member types. The framework uses a SiebelQA data class which holds all user account details.
-     * Example: SiebelQA336LoyaltyData
-     * @param member_type  anonymous/Customer/RR member
-     */
     def login(String member_type) {
         def memberType = member_type.replaceAll('\\s+', '').replaceAll('\\-', '').toLowerCase()
         switch (memberType) {
@@ -70,7 +64,7 @@ class SWALoginPage extends BasePage {
                 logRRMinorPoints()
                 break
             case "ageverifiedsenior":
-                loginIntoAccount(memberType)
+                loginIntoAgeVerifiedAccount(memberType)
                 break
             case "ageverifiedcustomer":
                 loginIntoAccount(memberType)
@@ -133,6 +127,7 @@ class SWALoginPage extends BasePage {
         }
     }
 
+
     def loginAsCustomerUser() {
         def user = createRRUser("customer")
         if (ToggleHomepage2.isOn() && globalNavigationHeader.isHomePage()) {
@@ -145,7 +140,7 @@ class SWALoginPage extends BasePage {
     RRUser createRRUser(String userType = "goodUser") {
         userType = (userType.equalsIgnoreCase("valid")) ? "goodUser" : userType
         assert [userType] ==
-                ["noAPlusCredits", "preferredName", "noDebitRapidRewardsAccount", "awardsOnly", "creditsOnly", "pointsOnly", "AlistPreferred", "Alist", "invalid", "promoUser", "goodUser", "goodUserWithNoActivityInLast30Days", "accountExpiredUser", "promoCertUser", "customer", "RRCreditCard", "RRSeniorCreditCard", "RRMinorPoints"].grep(userType)
+                ["ageVerifiedSenior","noAPlusCredits", "preferredName", "noDebitRapidRewardsAccount", "awardsOnly", "creditsOnly", "pointsOnly", "AlistPreferred", "Alist", "invalid", "promoUser", "goodUser", "goodUserWithNoActivityInLast30Days", "accountExpiredUser", "promoCertUser", "customer", "RRCreditCard", "RRSeniorCreditCard", "RRMinorPoints"].grep(userType)
         RRUser user = flow.isRapidRewardsPointsPurchaseOnly ? RRUserQueue.pollUser() : data.getUser(userType)
 
         if (DynaStubsIntegration.useDynaStubs()) {
@@ -154,7 +149,7 @@ class SWALoginPage extends BasePage {
 
         flow.setUser(user)
         userType = (userType.equalsIgnoreCase("goodUser") || userType.equalsIgnoreCase("RRCreditCard") || userType.equalsIgnoreCase("RRSeniorCreditCard") || userType.equalsIgnoreCase("RRMinorPoints") || userType.equalsIgnoreCase("preferredName")) ? "Rapid Rewards Member" : "A-List"
-        flow.setUserLoggedInRapidRewardsAccountType(userType)
+       // flow.ser.setUserLoggedInRapidRewardsAccountType(userType)
         return user
     }
 
@@ -163,34 +158,30 @@ class SWALoginPage extends BasePage {
         flow.isCustomer = true
     }
 
-    def logInAsCustomer (String username, String password) {
+    def logInAsCustomer(String username, String password) {
         logInAsAUser(username, password)
         flow.isCustomer = true
         flow.isLoggedIn = true
     }
+
     def logInAsAUser(String username, String password) {
         fillIn(ACCOUNT_NUMBER, username)
         fillIn(ACCOUNT_PASSWORD, password)
         waitForElement(LOGIN_SUBMIT_BUTTON).click()
     }
+
     private void logIntoAccount(RRUser user) {
         globalNavigationHeader.logIntoAccount(user)
         flow.isLoggedIn = true
     }
 
-    private void loginIntoAccount(String userType) {
+    private void loginIntoAgeVerifiedAccount(String userType) {
         RRUser user= null
         if (userType.contains("senior")) {
-            user = createRRUser("RRCreditCard")
-            user.setAccountNumber("600594945")
-            user.setPassword("test123")
-            user.setFirstName("Richard")
+            user = createRRUser("ageVerifiedSenior")
             logIntoRRAccount(user)
         } else if (userType.contains("customer")) {
             user = createRRUser("customer")
-            user.setAccountName("600594945")
-            user.setPassword("test123")
-            user.setFirstName("Richard")
             logIntoCustomerAccount(user)
         }
 

@@ -8,7 +8,8 @@ public class SiebelDevLoyaltyData extends Data {
     private static final String PASSWORD = "test123"
 
     private Map<String, RRUser> rrUserMap = new ImmutableMap.Builder()
-       .put("noAPlusCredits", new RRUser("Clark", "Kent", "carter1", "44", 1000, 0, 0, "44"))
+       .put("ageVerifiedSenior", new RRUser("Richard",PASSWORD,"600594945","Richard","","Parker", new Date(23,06,40), "Male", "600594945"))
+        .put("noAPlusCredits", new RRUser("Clark", "Kent", "carter1", "44", 1000, 0, 0, "44"))
        .put("noDebitRapidRewardsAccount", new RRUser("Sheldon", "Cooper", "carter1", "73", 1000, 0, 0, "73"))
        .put("awardsOnly", new RRUser("Amy", "Farrah Fowler", "carter1", "52", 0, 0, 3, "52"))
        .put("creditsOnly", new RRUser("John", "Cooper", "carter1", "51", 0, 3, 0, "51"))

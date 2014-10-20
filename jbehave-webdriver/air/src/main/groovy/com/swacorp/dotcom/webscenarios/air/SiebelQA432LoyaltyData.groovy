@@ -5,8 +5,10 @@ import com.google.common.collect.ImmutableMap
 public class SiebelQA432LoyaltyData extends Data {
 
     private final APlusUser aPlusUser = new APlusUser("502481906", "test@wnco.com", "12345");
+    private static final String PASSWORD = "test123"
 
     private Map<String, RRUser> rrUserMap = new ImmutableMap.Builder()
+            .put("ageVerifiedSenior", new RRUser("Richard",PASSWORD,"600594945","Richard","","Parker", new Date(23,06,40), "Male", "600594945"))
             .put("Alist", new RRUser("shaunpollock", "test123", "502481906", "Shaun", "", "Pollock", new Date(84,4,5), "Male", "502481906"))
             .put("goodUser", new RRUser("rickyponting", "test123", "502481884", "Ricky", "", "Ponting", new Date(84,2,5), "Male", "502481884"))
             .put("goodUser1", new RRUser("brunomars", "test123", "502481943", "Bruno", "", "Mars", new Date(84,7,5), "Male", "502481943"))

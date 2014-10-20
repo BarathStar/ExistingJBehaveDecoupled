@@ -71,9 +71,9 @@ class SWAPurchasePage extends BasePage
     SWADisabilitiesPage swaDisabilitiesPage
 
 
-
     public SWAPurchasePage(WebDriverProvider driverProvider) {
         super(driverProvider,"");
+
     }
 
     def purchaseTicket()
@@ -182,9 +182,8 @@ class SWAPurchasePage extends BasePage
                       }
               disabilitiesPage.with
                       {
-                          addAssistanceWithWheelchair()
-                          //TODO: below line was commented by Offshore
-						  //checkBlindOrHaveLowVision()
+                          //addAssistanceWithWheelchair() M.comment
+                          //checkBlindOrHaveLowVision() M.comment
                           verifyBasicPage()
                           verifyPageHeader()
                           verifyContinueButton()
@@ -249,12 +248,14 @@ class SWAPurchasePage extends BasePage
         }
        }
 
-	def addSSROptions(String paxIdx, String options)
+    def addSSROptions(String paxIdx, String options)
     {
         waitForElement(By.id("disability_button"+paxIdx)).click()
         swaDisabilitiesPage.addSSROptions(options)
         swaDisabilitiesPage.submit()
     }
+
+
 
     def addCWCPOCOptions(String paxIdx)
     {
@@ -286,4 +287,5 @@ class SWAPurchasePage extends BasePage
     {
         swaDisabilitiesPage.submit()
     }
+
 }

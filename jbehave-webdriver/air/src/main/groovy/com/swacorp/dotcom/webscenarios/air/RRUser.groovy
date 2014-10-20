@@ -9,8 +9,8 @@ import domain.RapidRewardsAccount
 class RRUser {
 
     private final String accountName
-    private String password
-    private String firstName
+    private final String password
+    private  final String firstName
     private final String preferredFirstName
     private final String middleName = ""
     private final String lastName
@@ -158,9 +158,7 @@ class RRUser {
     def setAccountNumber(String number) {
         this.number=number
     }
-    def setPassword(String password) {
-        this.password=password
-    }
+
     String getRRAccountName() {
         return accountName
     }
@@ -247,10 +245,6 @@ class RRUser {
 
     String getFirstName() {
         return firstName
-    }
-
-    def setFirstName(String firstName) {
-        this.firstName=firstName
     }
 
     String getMiddleName() {
