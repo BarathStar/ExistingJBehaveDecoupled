@@ -1,6 +1,6 @@
 package pages.elements
 
-
+import com.github.tanob.groobe.GrooBe
 import org.jbehave.web.selenium.WebDriverProvider
 import org.openqa.selenium.By
 import pages.BasePage
@@ -26,15 +26,21 @@ class StaticBookingWidget extends BasePage {
     private static final By ADULTPASSENGERCOUNTS = By.name("adultPassengerCount")
     private static final By SENIORPASSENGERCOUNTS = By.name("seniorPassengerCount")
     private static final By DESTINATION_AIRPORT = By.name("destinationAirport")
+    private String currentPath
     //private static final By ONE_WAY_RADIO_BUTTON = By.xpath(".//*[@id='sw_content']/div[1]/div[2]/div/form/div[1]/div[1]/div/div[2]/label/input")
 
     public StaticBookingWidget(WebDriverProvider driverProvider) {
         super(driverProvider)
+        GrooBe.activate()
+       currentPath = driverProvider.get().currentUrl.toString()
     }
 
     void openBookingWidget(String url){
-        super.openUrl(url)
+        System.out.println(currentPath)
+        openUrl(currentPath + url)
+
     }
+
 
     /**
      * Fills in a date for the outbound flight the date will be formatted into MM/dd/yyyy format

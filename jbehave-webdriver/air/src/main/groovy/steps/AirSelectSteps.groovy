@@ -449,4 +449,14 @@ class AirSelectSteps{
         flow.isRapidRewardsPointsPurchaseOnly = true
         selectFlightsAndContinue()
     }
+
+    @Then ("The fares in \$fareType")
+    void checkFare(String fareType) {
+        //TODO add assertion
+    }
+
+    @Then ("I view select flight page")
+    void viewingSelectFlightPage(){
+        //TODO add assertion
+    }
 }

@@ -87,12 +87,14 @@ public class BasePage extends WebDriverPage {
     }
 
     def open() {
+        System.out.println("Url to Open:" + this.domain + " " + this.pagePath)
         String urlToOpen = this.domain.concat(this.pagePath)
         System.out.println(SWARemoteWebDriver.screenThreadLabel() + " Opening page: " + urlToOpen
                 + " for : " + SWAContextView.retrievePageContext().currentStory + " " + SWAContextView.retrievePageContext().currentStep)
 
         get(urlToOpen)
     }
+
 
     void openInAnotherWindow(String url) {
         String javaScript = "window.open('$url','windowNewName')"

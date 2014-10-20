@@ -1,10 +1,5 @@
 Verify a Select Flight page is returned and the Fares are displayed in Dollars and promocode is WCMTEST.
 
-Narrative:
-As an Anonymous user
-I want to verify a Select Flight page is returned.
-So that I can view the select flight page with the correct Fares in Dollars and promocode is WCMTEST.
-
 Meta:
 @author Thunderbirds
 @flow air
@@ -12,6 +7,13 @@ Meta:
 @traveler adult
 @storyId 35857
 
+Narrative:
+As an Anonymous user
+I want to verify a Select Flight page is returned.
+So that I can view the select flight page with the correct Fares in Dollars and promocode is WCMTEST.
+
+GivenStories:
+A_initialPage/HomePage.story
 
 Scenario: Verify a select Flight page is returned and the Fares are displayed in Dollars.
 

@@ -35,6 +35,11 @@ class StaticBookingWidgetSteps {
     private static final By OUTBOUND_DATE = By.name("outboundDateString")
     private static final By RETURN_DATE = By.name("returnDateString")
 
+    @When("I search a flight with given url \$url")
+    void navigateToBookingWidget(String url) {
+        staticBookingWidget.openBookingWidget(url)
+    }
+
     @When("I enter valid dates and click on the search button")
     def enterValidDates(){
         completeWidgetWithValidOutboundDates()
@@ -141,11 +146,10 @@ class StaticBookingWidgetSteps {
 
     /**
      * Sets the trip type to round trip by clicking the Round Trip radio button
-     * @return
      */
-    @When("The trip type is round trip")
-    private checkRoundTrip() {
-        staticBookingWidget.clickRoundTrip()
+    @Then("The trip type is round trip")
+    void checkRoundTrip() {
+        //TODO add assertions
     }
 
 
@@ -158,7 +162,7 @@ class StaticBookingWidgetSteps {
     }
 
     @Then("I enter valid dates and click on the search button")
-    @When("I select the travel date")
+    @When("I select the travel date and I click on search.")
     def thenEnterValidDates(){
         completeWidgetWithValidOutboundDates()
         completeWidgetWithValidReturnDates()
@@ -242,20 +246,62 @@ class StaticBookingWidgetSteps {
      * Sets the number of adults on the flight
      * @param adult the number of adults specified in the story
      */
-    @When("The adult is \$adult")
+    @Then("The adult is \$adult")
     void setAdults(String adult)
     {
-        staticBookingWidget.setAdultPassengerCount(adult)
+        //TODO add assertions
     }
 
     /**
      * Sets the number of seniors on the flight
      * @param senior the number of seniors specified in the story
      */
-    @When("The seniors is \$senior")
+    @Then("The seniors is \$senior")
     void setSenior(String senior)
     {
-        staticBookingWidget.setSeniorPassengerCount(senior)
+       //TODO add assertions
+    }
+
+    @Then ("I verify my complete itinerary on the customized booking widget")
+    void verifyCompleteItinerary()
+    {
+        //TODO add assertions
+    }
+
+    @Then ("I view the customized booking widget")
+    void verifyViewingCustomizedBookingWidget(){
+        //TODO add assertions
+    }
+
+    @Then("The depart date is \$departDate")
+    void departureDate(String departDate) {
+        //TODO add assertions
+    }
+
+    @Then("The arrival date is \$arrivalDate")
+    void arrivalDate(String arrivalDate) {
+        //TODO add assertions
+    }
+
+    @Then("The promocode is \$promoCode")
+    void checkPromocode(String promoCode){
+        //TODO add assertions
+    }
+
+    @Then("The booking widget displayed as expected")
+    void bookingWidgetDisplaysCorrectly() {
+        //TODO add assertions
+    }
+
+    @Then("The arrival city is \$arrival")
+    void arrivalCityVerification(String arrival)
+    {
+        //TODO add assertions
+    }
+
+    @Then("The departure city is \$depart")
+    void departCityVerification(String depart){
+        //TODO add assertions
     }
 
 
