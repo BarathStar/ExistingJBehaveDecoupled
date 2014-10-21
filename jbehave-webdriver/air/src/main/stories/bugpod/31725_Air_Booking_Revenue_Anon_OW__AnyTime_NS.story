@@ -29,6 +29,6 @@ And I search the flight
 When I select the flight
 Then I view my price details
 When I purchase the ticket
-Then I view my itinerary on the confirmation page
-When I retrieve my itinerary
+Then I should see the confirmation page
+When I retrieve my itinerary details
 Then I view my itinerary

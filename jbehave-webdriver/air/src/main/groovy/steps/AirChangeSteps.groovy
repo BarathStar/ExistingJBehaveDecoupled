@@ -127,6 +127,36 @@ class AirChangeSteps {
         }
     }
 
+    /**
+     * Loads the Change Reservation page and input PNR/Firstname & Lastname and go to next change page
+     * //TODO need more refactor
+     * @return
+     */
+    @Given("I go to the change air reservation section from home page")
+    public clickOkChangeFlightThroughHomeMenu() {
+
+        // Test data. To be cleaned up
+        /*String firstName    = "SamFifteen"
+        String lastName     = "LeapFrog"
+        String PNR          = "MY96FS"*/
+
+        // Load change reservation page
+        changeAirReservationPage.open()
+
+        AirReservation airReservation = scenarioState.getLastAirReservation()
+        String firstName
+        String lastName
+
+        Passenger passenger  = airReservation.getPassengers().get(0)
+        firstName = passenger.firstName
+        lastName = passenger.lastName
+
+        //input PNR/FN/Ln and go to the Change reservation page
+        //changeAirReservationPage.retrieveAndSubmitItineraryToChange(PNR, firstName, lastName)
+        changeAirReservationPage.retrieveAndSubmitItineraryToChange(airReservation.adultPnr, firstName, lastName)
+
+    }
+
     @Given("I go to the change air reservation page")
     public clickOkChangeFlightThroughAirMenu() {
         homepage.clickOnChangeReservationLink()
@@ -158,6 +188,16 @@ class AirChangeSteps {
         itineraryData.promoCode = null
         changeAirReservationPage.verifyLookupConfirmationLink()
         changeAirReservationPage.retrieveAndSubmitItineraryToChange(airReservation.adultPnr, firstName, lastName)
+    }
+
+    /**
+     * Selects the outbound flight for change reservation
+     * @return
+     */
+    @Given("I select the flight to change")
+    public selectFlightToChange() {
+        selectFlightsToChangePage.selectFlightsToChangeAndContinueOneWay(itineraryData)
+
     }
 
     @Given("I select the flight to change and continue")

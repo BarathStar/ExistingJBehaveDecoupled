@@ -20,11 +20,10 @@ bugpod/31725_Air_Booking_Revenue_Anon_OW__AnyTime_NS.story
 Scenario: An Anonymous user change the reservation to different date with Business Select fare
 
 Given I am on the Home page
-And I go to the change air reservation page
-And I select the flight to change and continue
+And I go to the change air reservation section from home page
+And I select the flight to change
 And I search for a new flight on the next day
 And I select a new flight
 And I click Continue to the Reconcile page
 When I fill the reconcile page and continue
 Then I see the itinerary changed page
-And I verify the fare breakdown for the new changed itinerary

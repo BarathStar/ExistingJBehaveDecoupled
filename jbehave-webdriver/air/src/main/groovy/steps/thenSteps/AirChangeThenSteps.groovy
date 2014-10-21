@@ -180,6 +180,11 @@ class AirChangeThenSteps {
         changeAirReservationPage.shouldShowOopsMessage(OOPS_MYIDTRAVEL_MESSAGE)
     }
 
+    @Then("I verify the fare breakdown for the new changed itinerary")
+    def verifyFareBreakdownForChangedItinerary() {
+
+    }
+
     @Then("I see the itinerary changed page")
     def verifyItineraryChangedPage() {
         itineraryChangeConfirmationPage.verifyPage()

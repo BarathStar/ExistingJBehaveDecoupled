@@ -62,6 +62,16 @@ class SelectFlightsToChangePage extends BasePage {
         pageVerificationErrorWrapper(SUBMIT_BUTTON_NAME, PageName.SELECT_FLIGHTS_TO_CHANGE)
     }
 
+    /**
+     * Handles the selectFlightToChange. Selects the outbound for change reservation.
+     * @param itineraryData
+     * @return
+     */
+    public selectFlightsToChangeAndContinueOneWay(ItineraryData itineraryData) {
+        selectOriginDestinationsToChange(itineraryData.isOneWay())
+        continueToChangeItinerary()
+    }
+
     public selectFlightsToChangeAndContinue(ItineraryData itineraryData) {
         selectFlightsPageData.previousOutboundFlightPoints = selectFlightsPageData.outboundFlightPoints
         selectOriginDestinationsToChange(itineraryData.isOneWay())
