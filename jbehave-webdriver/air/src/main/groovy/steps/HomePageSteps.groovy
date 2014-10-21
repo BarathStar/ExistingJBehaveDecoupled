@@ -69,6 +69,7 @@ class HomePageSteps {
         }
     }
 
+
     @When("I search for flights as a senior from the Home page")
     void searchFlights() {
         openHomePage()

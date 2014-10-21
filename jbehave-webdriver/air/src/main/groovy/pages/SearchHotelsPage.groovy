@@ -5,7 +5,9 @@ import com.swacorp.dotcom.webscenarios.air.Route
 import com.swacorp.dotcom.webscenarios.air.config.Domains
 import org.jbehave.web.selenium.WebDriverProvider
 import org.openqa.selenium.By
+import org.openqa.selenium.Keys
 import org.openqa.selenium.WebElement
+import org.openqa.selenium.support.ui.Select
 import state.Flow
 import state.CurrentHotelPNR;
 import util.HotelItineraryData
@@ -37,6 +39,8 @@ class SearchHotelsPage extends BasePage {
     private static final By ADULT_NUMBER = By.id("adults");
     private static final By CHILDREN_NUMBER = By.id("children");
     private static final By ROOMS_NUMBER = By.id("rooms")
+    private static final By CLOSE_TO = By.id("hotelFilterCloseTo")
+    private static final By AIRPORT_CLOSE_TO = By.id("airportCloseToHotel")
 
     private static final String DATE_FORMAT_PATTERN = "MM/dd/yyyy";
     private static final String RETRIEVE_HOTEL_URL = "/hotels/retrieve-hotel-reservation.html"
@@ -93,6 +97,59 @@ class SearchHotelsPage extends BasePage {
         }
     }
 
+    /**
+     * Allows for selecting the close to option and if the option is an airport setting the airport name
+     * @param closeTo
+     * @param destination
+     */
+    void selectCloseTo(String closeTo, String destination) {
+        this.chooseInDropDownByValue(CLOSE_TO, closeTo.toUpperCase())
+        if(closeTo.equals("Airport")){
+            waitForElement(AIRPORT_CLOSE_TO).sendKeys(destination)
+        }
+
+
+    }
+
+    /**
+     * Allows for entering the Destination of where the hotel is located to be entered
+     * @param destination
+     * @return
+     */
+    def enterDestination(String destination)
+    {
+        enterMarketSearchKeyword(destination)
+
+    }
+
+    /**
+     * Allows for entering the number of rooms wanted
+     * @param numberOfRooms
+     * @return
+     */
+    def enterNumberOfRooms(int numberOfRooms )
+    {
+        chooseInDropDownByValue(ROOMS_NUMBER, numberOfRooms.toString())
+    }
+
+    /**
+     * Allows for entering the number of adults
+     * @param numberOfAdults
+     * @return
+     */
+    def enterNumberOfAdults(int numberOfAdults){
+        chooseInDropDownByValue(ADULT_NUMBER, numberOfAdults.toString())
+    }
+
+    /**
+     * Allows for entering the number of children
+     * @param numberOfChildren
+     * @return
+     */
+    def enterNumberOfChildren(int numberOfChildren) {
+        chooseInDropDownByValue(CHILDREN_NUMBER, numberOfChildren.toString())
+    }
+
     private def enterCheckoutDate(String checkOut) {
         if (!checkOut.isEmpty()) {
             fillIn(RETURN_DATE, checkOut)
@@ -116,6 +173,7 @@ class SearchHotelsPage extends BasePage {
         } else {
             fld.sendKeys(destination) + TAB
         }
+        fld.sendKeys(Keys.ENTER)
     }
 
     void clickSubmit() {
@@ -123,6 +181,9 @@ class SearchHotelsPage extends BasePage {
         checkNoOops() //TODO This may need to migrate to a step(s) class(es)
     }
 
+    /**
+     * Clicks the Find Hotels button
+     */
     void attemptToSearch() {
         waitForElement(SUBMIT_BUTTON).click()
     }

@@ -5,6 +5,7 @@ import domain.AirReservation
 import fixture.stubs.DynaStubsIntegration
 import org.jbehave.core.annotations.Alias
 import org.jbehave.core.annotations.Given
+import org.jbehave.core.annotations.Then
 import org.jbehave.core.annotations.When
 import pages.ConfirmationPage
 import pages.PurchasePage
@@ -164,6 +165,16 @@ class HotelSteps {
         searchHotelsPage.continueToPurchase()
     }
 
+    /**
+     * Clicks the Find Hotels button
+     * @return
+     */
+    @When("I click search to find Hotels")
+    def searchForHotels()
+    {
+        searchHotelsPage.attemptToSearch()
+    }
+
     def addAHotelToCart() {
         searchHotelsPage.fillInHotelRequiredField()
         searchHotelsPage.clickSubmit()
@@ -245,4 +256,51 @@ class HotelSteps {
             dyna.generateSelectHotelSpecification(hotelData.hotelId)
         }
     }
+
+    /**
+     * Sets the city in which the passenger will be booking a hotel
+     * @param arrivalCity
+     * @return
+     */
+    @When("the arrival city is \$arrivalCity")
+    def selectArrivalCity(String arrivalCity) {
+        searchHotelsPage.enterDestination(arrivalCity)
+    }
+
+    /**
+     * Sets the number of rooms, children, and adults for the hotel
+     * @param numRooms
+     * @param numAdults
+     * @param numChildren
+     * @return
+     */
+    @When("I want \$numRooms rooms for \$numAdults adults and \$numChildren children")
+    def selectRoomsAdultsChildren(int numRooms, int numAdults, int numChildren)
+    {
+        searchHotelsPage.enterNumberOfRooms(numRooms)
+        searchHotelsPage.enterNumberOfAdults(numAdults)
+        searchHotelsPage.enterNumberOfChildren(numChildren)
+    }
+
+    /**
+     * Sets the close to option and if close to an airport sets the airport as well
+     * @param option
+     * @param destination
+     * @return
+     */
+    @When("I want it close to the \$option in \$destination")
+    def selectCloseToOption(String option, String destination) {
+        searchHotelsPage.selectCloseTo(option, destination)
+    }
+
+    /**
+     * Needs to have assertions built in but checks that the Select Hotel Page loads without errors
+     */
+    @Then("I get the Select Hotel page without errors")
+    void verifySelectHotelPage() {
+        //TODO add assertions
+    }
+
+
+
 }

@@ -40,6 +40,10 @@ class StaticBookingWidgetSteps {
         staticBookingWidget.openBookingWidget(url)
     }
 
+    /**
+     * Enters in a valid return and departure date and then clicks the search button
+     * @return
+     */
     @When("I enter valid dates and click on the search button")
     def enterValidDates(){
         completeWidgetWithValidOutboundDates()
@@ -47,6 +51,10 @@ class StaticBookingWidgetSteps {
         staticBookingWidget.clickOnSearchButtonAndValidatePage()
     }
 
+    /**
+     * Enters in a valid departure date
+     * @return
+     */
     @When("I enter valid outbound date")
     def enterDateField() {
         completeWidgetWithValidOutboundDates()
@@ -243,7 +251,7 @@ class StaticBookingWidgetSteps {
     }
 
     /**
-     * Sets the number of adults on the flight
+     * Verifies that the number of adults is correct
      * @param adult the number of adults specified in the story
      */
     @Then("The adult is \$adult")
@@ -253,7 +261,7 @@ class StaticBookingWidgetSteps {
     }
 
     /**
-     * Sets the number of seniors on the flight
+     * Verifies that the number of seniors is correct
      * @param senior the number of seniors specified in the story
      */
     @Then("The seniors is \$senior")
@@ -262,43 +270,72 @@ class StaticBookingWidgetSteps {
        //TODO add assertions
     }
 
+    /**
+     * Verifies that the booking itinerary has been completly filled out
+     */
     @Then ("I verify my complete itinerary on the customized booking widget")
     void verifyCompleteItinerary()
     {
         //TODO add assertions
     }
 
+    /**
+     * Verifies that the booking widget has been successfully loaded
+     */
     @Then ("I view the customized booking widget")
     void verifyViewingCustomizedBookingWidget(){
         //TODO add assertions
     }
 
+    /**
+     * Verifies that the departure date is set to the parameters from the story
+     * @param departDate
+     */
     @Then("The depart date is \$departDate")
     void departureDate(String departDate) {
         //TODO add assertions
     }
 
+    /**
+     * Verifies that the arrival date is set to the parameters from the story
+     * @param arrivalDate
+     */
     @Then("The arrival date is \$arrivalDate")
     void arrivalDate(String arrivalDate) {
         //TODO add assertions
     }
 
+    /**
+     * Verifies that the promocode is correct with what was specified in the story
+     * @param promoCode
+     */
     @Then("The promocode is \$promoCode")
     void checkPromocode(String promoCode){
         //TODO add assertions
     }
 
+    /**
+     * Verifies that the booking widget has been displayed correctly
+     */
     @Then("The booking widget displayed as expected")
     void bookingWidgetDisplaysCorrectly() {
         //TODO add assertions
     }
 
+    /**
+     * Verifies that the arrival city has been set correctly
+     * @param arrival
+     */
     @Then("The arrival city is \$arrival")
     void arrivalCityVerification(String arrival)
     {
         //TODO add assertions
     }
 
+    /**
+     * Verifies that the departure city has been set correctly
+     * @param depart
+     */
     @Then("The departure city is \$depart")
     void departCityVerification(String depart){
         //TODO add assertions

@@ -29,12 +29,21 @@ class StaticBookingWidget extends BasePage {
     private String currentPath
     //private static final By ONE_WAY_RADIO_BUTTON = By.xpath(".//*[@id='sw_content']/div[1]/div[2]/div/form/div[1]/div[1]/div/div[2]/label/input")
 
+    /**
+     * Calls the instance of the webdriver for this webpage. This method also grabs the current url for use in later methods.
+     * @param driverProvider
+     */
     public StaticBookingWidget(WebDriverProvider driverProvider) {
         super(driverProvider)
         GrooBe.activate()
        currentPath = driverProvider.get().currentUrl.toString()
     }
 
+    /**
+     * Takes in the current url which is assumed to be the home page and then adds
+     * the url from the story file to navigate to the correct Booking Widget page
+     * @param url
+     */
     void openBookingWidget(String url){
         System.out.println(currentPath)
         openUrl(currentPath + url)
