@@ -255,6 +255,12 @@ class CheckinPage extends BasePage {
     }
 
     //Ravendra - Strory# -date:10/18/14 - //
+    //Ravendra - Strory# -date:10/20/14 - //
+
+    boolean verifyCheckInButtonIsPresent() {
+        return isElementPresent(CHECKIN_BUTTON, 25)
+    }
+
     def verifyCheckinButtonEnabledDisabled(){
         WebElement checkinButton = waitForElement(CHECKIN_BUTTON)
         if(checkinButton.isEnabled()) {

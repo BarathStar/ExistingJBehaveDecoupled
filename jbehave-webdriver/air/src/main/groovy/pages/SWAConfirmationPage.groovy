@@ -1128,6 +1128,7 @@ class SWAConfirmationPage extends BasePage {
 
     //Ravendra - Strory# -date:10/19/14 - //
     //Ravendra: refactor method below to make sure method has only required verifications not ALL.
+
     void verifySWACompleteItinerary()
     {
         verifyBasicPage()  //ok

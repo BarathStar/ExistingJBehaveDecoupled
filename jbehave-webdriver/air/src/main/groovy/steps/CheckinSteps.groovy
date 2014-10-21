@@ -23,7 +23,9 @@ public class CheckinSteps {
     TravelDocumentsPage travelDocumentsPage
     //Ravendra - Strory# -date:10/18/14 - //
     //changed ConfirmationPage to SWAConfirmationPage.
-    SWAConfirmationPage confirmationPage
+    //Ravendra - Strory# -date:10/20/14 - //
+    //Changed back to ConfirmationPage.
+    ConfirmationPage confirmationPage
     ScenarioState scenarioState
     CheckinPage checkinPage
     NonRevLandingPage nonRevLandingPage
@@ -123,10 +125,11 @@ public class CheckinSteps {
     }
 
     //Ravendra - Strory# -date:10/18/14 - //
+    //Ravendra - Strory# -date:10/20/14 - //
     @Given("I click on the Continue button if I am in the Check in and Print BP options page")
     @When("I click on the Continue button if I am in the Check in and Print BP options page")
-    void verifyContinueButtonIsPresent() {
-        if(checkinPage.verifyCheckinButtonEnabledDisabled()) {
+    void clickCheckInToContinuePrintBP() {
+        if(checkinPage.verifyCheckInButtonIsPresent()) {
             checkinPage.clickCheckinButton()
         }
     }
@@ -274,11 +277,13 @@ public class CheckinSteps {
     def verifySeatSelectionErrorVerbiage() {
         checkinPage.verifySeatSelectionUnavailableVerbiage()
     }
-
+    //Ravendra - Strory# -date:10/20/14 - //
+    // new candidate step added to Aliase list.
     @Given("I click on the Check in button on the Confirmation Page")
     @When("I click on the Check in button on the Confirmation Page")
     @Aliases(values = ["I proceed to the new online checkin page",
-                       "I click on the Check in button on the view reservations Page"])
+                       "I click on the Check in button on the view reservations Page",
+                        "I click on the Check in button on the manage reservation page"])
     void clickOnCheckInForFlightButton() {
         AirReservation airReservation = scenarioState.getLastAirReservation()
         Passenger passenger = airReservation.getPassengers().get(0)
